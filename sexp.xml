@@ -3,7 +3,7 @@
       validation and schema-aware editing -->
 
 <!DOCTYPE rfc [
-  <!ENTITY filename "draft-rivest-sexp-01">
+  <!ENTITY filename "draft-rivest-sexp-02">
   <!ENTITY nbsp     "&#160;">
   <!ENTITY zwsp     "&#8203;">
   <!ENTITY nbhy     "&#8209;">
@@ -79,9 +79,10 @@ recommended. -->
      </address>
    </author>
 
-   <date year="2023" month="6" day="25"/>
+   <date year="2023" month="7" day="8"/>
 
-<area>Applications and Real Time</area>
+   <area>Applications and Real Time</area>
+   
 <workgroup>Network Working Group</workgroup>
 
 <keyword>Sexp</keyword>
@@ -164,7 +165,7 @@ representations that allow efficient processing.</dd>
 <li>Section 5 describes how to represent lists.</li>
 <li>Section 6 discusses how S-expressions are represented for various
 uses.</li> 
-<li>Section 7 gives a BNF syntax for S-expressions.</li>
+<li>Section 7 gives an ABNF syntax for S-expressions.</li>
 <li>Section 8 talks about how S-expressions might be represented in
 memory.</li> 
 <li>Section 9 briefly describes implementations for handling
@@ -188,9 +189,13 @@ similar to, but more readable and flexible than, Bernstein's
 
 <t>Although made publicly available as a file named
 draft-rivest-sexp-00.txt on 4 May 1997, this document was not actually
-submitted to the IETF as that time. Version -00 of this Internet Draft
-was a modernized version of that file. Version -01 has some further
-polishing and corrections.</t>
+submitted to the IETF as that time. Version -00 of this document was a
+modernized version of that file. Version -01 had some further
+polishing and corrections. The further significant changes made in
+this document were changing the original BNF notation to ABNF <xref
+target="RFC5234"/> (see <xref target="ABNF"/>) and changing the
+default character set in <xref target="DisplayHint"/> to UTF-8 <xref
+target="RFC4648"/>.</t>
 
 </section>  <!-- 1.1 -->
 
@@ -574,14 +579,14 @@ than whitespace and base-64 characters.</t>
 
 </section>  <!-- 4.5 -->
 
-<section>  <!-- 4.6 -->
+<section anchor="DisplayHint">  <!-- 4.6 -->
   <name>Display hint</name>
 
 <t>Any octet string may be preceded by a single "display hint".</t>
 
 <t>The purposes of the display hint is to provide information on how
 to display the octet string to a user.  It has no other function.
-Many of the MIME types work here.</t>
+Many of the MIME <xref target="RFC2046"/> types work here.</t>
 
 <t>A display-hint is an octet string surrounded by square brackets.
 There may be whitespace separating the octet string from the
@@ -600,11 +605,12 @@ octet string.</t>
     ["http://abc.com/display-types/funky.html"]
 </sourcecode>
 
-<t>In applications an octet-string that is untyped may be considered to have
-a pre-specified "default" mime type.  The mime type</t>
+<t>In applications an octet-string that is untyped may be considered
+to have a pre-specified "default" MIME <xref target="RFC2046"/> type.
+The MIME type</t>
 
 <sourcecode>
-    "text/plain; charset=iso-8859-1"
+    "text/plain; charset=utf-8"
 </sourcecode>
 
 <t>is the standard default.</t>
@@ -622,7 +628,7 @@ is not equal to the octet-string "ABC".</t>
 
 <t>An untyped octet-string can be compared to another octet-string (typed
 or not) by considering it as a typed octet-string with the default
-mime-type.</t>
+mime-type specified in <xref target="DisplayHint"/> .</t>
 
 </section>  <!-- 4.7 -->
 
@@ -748,83 +754,98 @@ representations of strings with omitted lengths, and so on.</t>
 
 </section>  <!-- 6. -->
 
-<section>  <!-- 7. -->
-  <name>BNF for syntax</name>
+<section anchor="ABNF">  <!-- 7. -->
+  <name>ABNF for syntax</name>
 
-<t>We give separate BNF's for canonical and advanced forms of S-expressions.
-We use the following notation:</t>
-<sourcecode> <![CDATA[
-    <x>*          means 0 or more occurrences of <x>
-    <x>+          means 1 or more occurrences of <x>
-    <x>?          means 0 or 1 occurrences of <x>
-    parentheses   are used for grouping, as in (<x> | <y>)*
-]]> </sourcecode>
+<t>ABNF is the Augmented Backus-Naur Form for syntax specifications as
+defined in <xref target="RFC5234"/>. We give separate ABNF's for
+canonical, basic, and advanced forms of S-expressions.  The rules
+below in all caps are defined in Appendix A of <xref
+target="RFC5234"/>.</t>
 
 <t>For canonical transport:</t>
 
 <sourcecode> <![CDATA[
-<sexpr>         :: <string> | <list>
-<string>        :: <display>? <simple-string>
-<simple-string> :: <raw>
-<display>       :: "[" <simple-string> "]"
-<raw>           :: <decimal> ":" <bytes>
-<decimal>       :: "0" | ("1"..."9")("0"..."9")*
-<bytes>         -- any string of bytes, of the indicated length
-<list>          :: "(" <sexp>* ")"
+sexp     =  raw / ("(" *sexp ")")
+
+raw      =  decimal ":" *OCTET
+               ; the length followed by a colon and the exact
+               ;  number of OCTET indicated by the length
+
+decimal  =  %x30 / (%x31-39 *DIGIT)
 ]]> </sourcecode>
 
 <t>For basic transport:</t>
 
 <sourcecode> <![CDATA[
-<sexpr>         :: <canonical> | <base-64>
-<canonical>     :: <string> | <list>
-<string>        :: <display>? <simple-string>
-<simple-string> :: <raw>
-<display>       :: "[" <simple-string> "]"
-<raw>           :: <decimal> ":" <bytes>
-<decimal>       :: "0" | ("1"..."9")("0"..."9")*
-<bytes>         -- any string of bytes, of the indicated length
-<list>          :: "(" <canonical>* ")"
-<base-64>       :: "{" <base-64-char>* "}"
-<base-64-char>  :: <alpha> | <decimal-digit> |
-                       "+" | "/" | "=" ;
-<alpha>         :: <upper-case> | <lower-case>
-<lower-case>    :: "a" | ... | "z" ;
-<upper-case>    :: "A" | ... | "Z" ;
+sexp           =  canonical / base-64-raw
+
+canonical      =  raw / ("(" *canonical ")")
+
+raw            =  decimal ":" *OCTET
+                     ; the length followed by a colon and the exact
+                     ;  number of OCTET indicated by the length
+
+decimal        =  %x30 / (%x31-39 *DIGIT)
+
+base-64-raw    =  "{" 3*base-64-char "}"
+
+base-64-char   =  ALPHA / DIGIT / "+" / "/" / "="
 ]]> </sourcecode>
 
 <t>For advanced transport:</t>
 
 <sourcecode> <![CDATA[
-<sexpr>         :: <string> | <list>
-<string>        :: <display>? <simple-string>
-<simple-string> :: <raw> | <token> | <base-64> |
-                       <hexadecimal> | <quoted-string>
-<display>       :: "[" <whitespce> <simple-string>
-                       <whitespace> "]"
-<raw>           :: <decimal> ":" <bytes>
-<decimal>       :: "0" | ("1"..."9")("0"..."9")*
-<bytes>         -- any string of bytes, of the indicated length
-<token>         :: (<alpha> | <simple-punct>) (<alpha> |
-                       <decimal-digit> | <simple-punct> )*
-<base-64>       :: <decimal>? "|"( <base-64-char> |
-                       <whitespace> )* "|"
-<hexadecimal>   :: "#" ( <hex-digit> | <white-space> )* "#"
-<quoted-string> :: <decimal>? <quoted-string-body>
-<quoted-string-body> :: "\"" <bytes> "\""
-<list>          :: "(" <whitespace> <sexp>* <whitespace> ")"
-<whitespace>    :: <whitespace-char>*
-<alpha>         :: <upper-case> | <lower-case>
-<lower-case>    :: "a" | ... | "z" ;
-<upper-case>    :: "A" | ... | "Z" ;
-<decimal-digit> :: "0" | ... | "9" ;
-<hex-digit>     :: <decimal-digit> |
-                       "A" | ... | "F" | "a" | ... | "f"
-<simple-punc>   :: "-" | "." | "/" | "_" |
-                       ":" | "*" | "+" | "="
-<whitespace-char> :: " " | "\t" | "\r" | "\n" | "\v" | "\f"
-<base-64-char>  :: <alpha> | <decimal-digit> |
-                       "+" | "/" | "="
+sexp           =  *whitespace value *whitespace
+
+whitespace     =  SP / HTAB / vtab / CR / LF / ff
+
+vtab           =  %x0B   ; vertical tab
+
+ff             =  %x0C   ; form feed
+
+value          =  string / ("(" *(value / whitespace) ")")
+
+string         =  [display] *whitespace simple-string
+
+display        =  "[" *whitespace simple-string *whitespace "]"
+
+simple-string  =  raw / token / base-64 / base-64-raw /
+                        hexadecimal / quoted-string
+
+raw            =  decimal ":" *OCTET
+                     ; the length followed by a colon and the exact
+                     ;  number of OCTET indicated by the length
+
+decimal        =  %x30 / (%x31-39 *DIGIT)
+
+token          =  (ALPHA / simple-punc) *(ALPHA / DIGIT /
+                     simple-punc)
+
+simple-punc    =  "-" / "." / "/" / "_" / ":" / "*" / "+" / "="
+
+base-64        =  [decimal] "|" *(base-64-char / whitespace) "|"
+
+base-64-char   =  ALPHA / DIGIT / "+" / "/" / "="
+
+base-64-raw    =  [decimal] "{" 1*(base-64-char / whitespace) "}"
+                     ; at least 3 base-64-char
+
+hexadecimal    =  [decimal] "#" *(HEXDIG / whitespace) "#"
+                     ; even number of hexadecimal digits
+
+quoted-string  =  [decimal] DQUOTE *(printable / escaped) DQUOTE
+
+escaped        =  backslash (%x3F / %x61 / %x62 / %x66 / %x6E /
+                  %x72 / %x74 / %x76 / DQUOTE / quote / backslash /
+                  3(%x30-37) / (%x78 2HEXDIG) / CR / LF /
+                  (CR LF) / (LF CR))
+
+backslash      =  %x5C
+
+printable      =  %x21-26 / %x28-7E
+
+quote          =  %x27   ; single quote
 ]]> </sourcecode>
 
 </section>  <!-- 7. -->
@@ -1027,6 +1048,8 @@ reliable verification of digital signatures and this is provided in
 <xi:include
     href="https://www.rfc-editor.org/refs/bibxml/reference.RFC.4648.xml"/>
 <xi:include
+    href="https://www.rfc-editor.org/refs/bibxml/reference.RFC.5234.xml"/>
+<xi:include
     href="https://www.rfc-editor.org/refs/bibxml/reference.RFC.8174.xml"/>
 
 </references>
@@ -1074,6 +1097,8 @@ target="https://www.ietf.org/archive/id/draft-bernstein-netstrings-02.txt">
   <seriesInfo name="ISBN-10" value="0262130114"/>
 </reference>
 
+<xi:include
+    href="https://www.rfc-editor.org/refs/bibxml/reference.RFC.2046.xml"/>
 <xi:include
     href="https://www.rfc-editor.org/refs/bibxml/reference.RFC.2692.xml"/>
 <xi:include
@@ -1178,6 +1203,20 @@ submited to the IETF.</t>
 </ol>
 
   </section>
+
+  <section>
+    <name>Changes from -01 to -02</name>
+
+<ol>
+  <li>Change default MIME Type in <xref target="DisplayHint"/> to have
+  charset=utf-8 <xref target="RFC4648"/>.</li>
+  <li>Change BNF to ABNF and add reference to <xref
+  target="RFC5234"/>.</li>
+  <li>Move Marc Petit-Huguenin to a Contributors section for his work
+  on the ABNF.</li>
+</ol>
+
+  </section>
   
 </section>
 
@@ -1185,8 +1224,21 @@ submited to the IETF.</t>
   <name>Acknowledgements</name>
   
 <t>The comments and suggestions of the following are gratefully
-acknowledged: Marc Petit-Huguenin, John Klensin.</t>
+acknowledged: John Klensin.</t>
 
+</section>
+
+<section anchor="Contributors" numbered="false">
+  <name>Contributors</name>
+  
+  <t>Special thanks to the following contributor:</t>
+  <contact fullname="Marc Petit-Huguenin" initials="M."
+           surname="Petit-Huguenin"> 
+    <organization>Impedance Mismatch LLC</organization>
+    <address>
+      <email>marc@petit-huguenin.org</email>
+    </address>
+  </contact>
 </section>
 
 </back>
