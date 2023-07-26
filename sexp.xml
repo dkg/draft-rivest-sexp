@@ -3,7 +3,7 @@
       validation and schema-aware editing -->
 
 <!DOCTYPE rfc [
-  <!ENTITY filename "draft-rivest-sexp-00">
+  <!ENTITY filename "draft-rivest-sexp-01">
   <!ENTITY nbsp     "&#160;">
   <!ENTITY zwsp     "&#8203;">
   <!ENTITY nbhy     "&#8209;">
@@ -79,22 +79,18 @@ recommended. -->
      </address>
    </author>
 
-   <date year="2023" month="5" day="25"/>
+   <date year="2023" month="6" day="25"/>
 
 <area>Applications and Real Time</area>
 <workgroup>Network Working Group</workgroup>
-   <!-- "Internet Engineering Task Force" is fine for individual
-        submissions.  If this element is not present, the default is
-        "Network Working Group", which is used by the RFC Editor as a
-        nod to the history of the RFC Series. -->
 
-<keyword></keyword>
+<keyword>Sexp</keyword>
    <!-- Multiple keywords are allowed.  Keywords are incorporated
         into HTML output files for use by search engines. -->
 
 <abstract>
   <t>This memo describes a data structure called "S-expressions" that
-  are suitable for representing arbitrary complex data structures.  We
+  are suitable for representing arbitrary, complex data structures.  We
   make precise the encodings of S-expressions: we give a "canonical
   form" for S-expressions, described two "transport" representations,
   and also describe an "advanced" format for display to people.</t>
@@ -160,19 +156,45 @@ representations that allow efficient processing.</dd>
 
 </dl>
 
-<t>Section 2 gives an introduction to S-expressions.</t>
-<t>Section 3 discusses the character sets used.</t>
-<t>Section 4 presents the various representations of octet-strings.</t>
-<t>Section 5 describes how to represent lists.</t>
-<t>Section 6 discusses how S-expressions are represented for various uses.</t>
-<t>Section 7 gives a BNF syntax for S-expressions.</t>
-<t>Section 8 talks about how S-expressions might be represented in memory.</t>
-<t>Section 9 briefly describes implementations for handling S-expressions.</t>
-<t>Section 10 discusses how applications might utilize S-expressions.</t>
-<t>Section 11 gives historical notes on S-expressions.</t>
-<t>Section 12 gives references.</t>
+<t>The Sections of this document cover material as follows:</t>
+<ul spacing="compact">
+<li>Section 2 gives an introduction to S-expressions.</li>
+<li>Section 3 discusses the character sets used.</li>
+<li>Section 4 presents the various representations of octet-strings.</li>
+<li>Section 5 describes how to represent lists.</li>
+<li>Section 6 discusses how S-expressions are represented for various
+uses.</li> 
+<li>Section 7 gives a BNF syntax for S-expressions.</li>
+<li>Section 8 talks about how S-expressions might be represented in
+memory.</li> 
+<li>Section 9 briefly describes implementations for handling
+S-expressions.</li> 
+<li>Section 10 discusses how applications might utilize
+S-expressions.</li>
+</ul>
 
-<section> <!-- 1.1 -->
+<section>  <!-- 1.1 -->
+  <name>Historical Notes</name>
+
+<t>The S-expression technology described here was originally developed
+for "SDSI" (the Simple Distributed Security Infrastructure by Lampson
+and Rivest <xref target="SDSI"/>) in 1996, although the origins
+clearly date back to McCarthy's <xref target="LISP"/> programming
+language.  It was further refined and improved during the merger of
+SDSI and SPKI <xref target="SPKI"/> <xref target="RFC2692"/> <xref
+target="RFC2693"/> during the first half of 1997.  S-expressions are
+similar to, but more readable and flexible than, Bernstein's
+"net-strings" <xref target="BERN"/>.</t>
+
+<t>Although made publicly available as a file named
+draft-rivest-sexp-00.txt on 4 May 1997, this document was not actually
+submitted to the IETF as that time. Version -00 of this Internet Draft
+was a modernized version of that file. Version -01 has some further
+polishing and corrections.</t>
+
+</section>  <!-- 1.1 -->
+
+<section> <!-- 1.2 -->
   <name>Conventions Used in This Document</name>
 
 <t>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
@@ -181,7 +203,7 @@ representations that allow efficient processing.</dd>
 14 <xref target="RFC2119"/> <xref target="RFC8174"/> when, and only
 when, they appear in all capitals, as shown here.</t>
 
-</section>  <!-- 1.1 -->
+</section>  <!-- 1.2 -->
 
 </section> <!-- end 1. Introduction -->
 
@@ -199,34 +221,26 @@ when, they appear in all capitals, as shown here.</t>
 may be many different but equivalent ways of representing an
 octet-string</t>
 
-<dl spacing="compact">
+<sourcecode>
+    abc         -- as a token
+    "abc"       -- as a quoted string
+    #616263#    -- as a hexadecimal string
+    3:abc       -- as a length-prefixed "verbatim" encoding
+    {MzphYmM=}  -- as a base-64 encoding of the verbatim
+                     encoding (that is, an encoding of "3:abc")
+    |YWJj|      -- as a base-64 encoding of the octet-string
+                     "abc"
+</sourcecode>
 
-<dt>abc&nbsp;&nbsp;&nbsp;</dt><dd>-- as a token</dd>
-
-<dt>"abc"&nbsp;</dt><dd>-- as a quoted string</dd>
-
-<dt>#616263#</dt><dd>-- as a hexadecimal string</dd>
-
-<dt>3:abc&nbsp;</dt><dd>-- as a length-prefixed "verbatim"
-encoding</dd>
-
-<dt>{MzphYmM=}</dt><dd>-- as a base-64 encoding of the verbatim
-encoding (that is, an encoding of "3:abc")</dd>
-
-<dt>|YWJj|</dt><dd>-- as a base-64 encoding of the octet-string
-"abc"</dd>
-
-</dl>
-
-<t>These encodings are all equivalent; they all denote the same octet
-string.</t>
+<t>The above encodings are all equivalent; they all denote the same
+octet string.</t>
 
 <t>We will give details of these encodings later on, and also describe
-how to give a "display type" to a byte string.</t>
+how to give a "display type" to a simple string.</t>
 
 <t>A list is a finite sequence of zero or more simpler S-expressions.
-A list may be represented by using parentheses to surround the
-sequence of encodings of its elements, as in:</t>
+A list is represented by using parentheses to surround the sequence of
+encodings of its elements, as in:</t>
 
 <sourcecode>
     (abc (de #6667#) "ghi jkl")
@@ -240,8 +254,8 @@ handle:</t>
 
 <ul>
 
-  <li>a "transport" encoding for transporting the S-expression between
-  computers.</li>
+  <li>a "transport" or "basic" encoding for transporting the
+  S-expression between computers.</li>
 
   <li>a "canonical" encoding, used when signing the
   S-expression.</li>
@@ -269,14 +283,20 @@ characters in US-ASCII:</t>
 <dl spacing="compact">
 
   <dt>Alphabetic:</dt><dd>
-  <sourcecode>A B ... Z a b ... z</sourcecode></dd>
+  <sourcecode>
+    A B ... Z a b ... z
+  </sourcecode></dd>
 
   <dt>numeric:</dt><dd>
-  <sourcecode>0 1 ... 9</sourcecode></dd>
+  <sourcecode>
+    0 1 ... 9
+  </sourcecode></dd>
 
   <dt>whitespace:</dt><dd>
-  <sourcecode>space, horizontal tab, vertical tab, form-feed
-  carriage-return, line-feed</sourcecode></dd>
+  <sourcecode>
+    space, horizontal tab, vertical tab, form-feed
+    carriage-return, line-feed
+  </sourcecode></dd>
 
   <dt>The following graphics characters, which we call
   "pseudo-alphabetic":</dt><dd>
@@ -310,7 +330,7 @@ characters in US-ASCII:</t>
   </dd>
 
   <dt>The following characters are unused and unavailable, except in
-        "verbatim" encodings:</dt><dd>
+        "verbatim" and "quoted string" encodings:</dt><dd>
 <sourcecode> <![CDATA[
     ! exclamation point
     % percent
@@ -341,12 +361,12 @@ that the octet-string may have length zero.</t>
   <section>  <!-- 4.1 -->
     <name>Verbatim representation</name>
 
-<t>A verbatim encoding of an octet string consists of four parts:</t>
+<t>A verbatim encoding of an octet string consists of three parts:</t>
 
 <ul>
 
   <li>the length (number of octets) of the octet-string, given in
-  decimal most significant digit first, with no leading zeros.</li>
+  decimal, most significant digit first, with no leading zeros.</li>
 
   <li>a colon ":"</li>
 
@@ -397,29 +417,33 @@ a character.</t>
 
 <t>The escape conventions within the quoted string are as follows
 (these follow the "C" programming language conventions, with an
-extension for ignoring line terminators of just LF or CRLF):</t>
+extension for ignoring line terminators of just LF or CRLF and more
+restrictive octal and hexadecimal value formats):</t>
 
 <sourcecode>
-    \b      -- backspace
-    \t      -- horizontal tab
-    \v      -- vertical tab
-    \n      -- new-line
-    \f      -- form-feed
-    \r      -- carriage-return
-    \"      -- double-quote
-    \'      -- single-quote
-    \\      -- back-slash
-    \ooo     -- character with octal value ooo (all three digits
-must be present)
-    \xhh     -- character with hexadecimal value hh (both digits
-must be present)
-    \&lt;carriage-return&gt;   -- causes carriage-return to be
-ignored.
-    \&lt;line-feed&gt;         -- causes linefeed to be ignored
-    \&lt;carriage-return&gt;&lt;line-feed&gt;   -- causes CRLF
-to be ignored.
-    \&lt;line-feed&gt;&lt;carriage-return&gt;   -- causes LFCR
-to be ignored.
+    \a     -- audible alert (bell)
+    \b     -- backspace
+    \t     -- horizontal tab
+    \v     -- vertical tab
+    \n     -- new-line
+    \f     -- form-feed
+    \r     -- carriage-return
+    \"     -- double-quote
+    \'     -- single-quote
+    \?     -- question mark
+    \\     -- back-slash
+    \ooo   -- character with octal value ooo (all three
+              digits MUST be present)
+    \xhh   -- character with hexadecimal value hh (both
+              digits MUST be present)
+    \&lt;carriage-return&gt;   -- causes carriage-return
+              to be ignored.
+    \&lt;line-feed&gt;         -- causes linefeed to be
+              ignored.
+    \&lt;carriage-return&gt;&lt;line-feed&gt;   -- causes
+              CRLF to be ignored.
+    \&lt;line-feed&gt;&lt;carriage-return&gt;   -- causes
+              LFCR to be ignored.
 </sourcecode>
 
 <t>Here are some examples of quoted-string encodings:</t>
@@ -430,8 +454,8 @@ to be ignored.
     7"subject"
     3"\n\n\n"
     "This has\n two lines."
-    "This has\
-    one."
+    "This has \
+     one."
     ""
 </sourcecode>
 
@@ -482,7 +506,7 @@ consisting of:</t>
 
   <li>a hexadecimal encoding of the octet string, with each octet
   represented with two hexadecimal digits, most significant digit
-  first.</li>
+  first. There MUST be an even number of such digits.</li>
 
   <li>a sharp-sign "#"</li>
 
@@ -514,7 +538,8 @@ target="RFC4648"/> consisting of:</t>
 
 <li>a vertical bar "|"</li>
 
-<li>the rfc 1521 base-64 encoding of the octet string.</li>
+<li>the base-64 <xref target="RFC4648"/> encoding of the octet
+string.</li>
 
 <li>a final vertical bar "|"</li>
 </ul>
@@ -622,7 +647,7 @@ parenthesis, or precede the final right parenthesis.</t>
 
     (11:certificate(6:issuer3:bob)(7:subject5:alice))
 
-    ({3Rt=} "1997" murphy 3:{XC++})
+    ({ODpFeGFtcGxlIQ==} "1997" murphy 3:XC+)
 </sourcecode>
 
 </section>
@@ -642,9 +667,9 @@ parenthesis, or precede the final right parenthesis.</t>
 
 <t>
 The first two MUST be supported by any implementation; the last is
-optional.</t>
+OPTIONAL.</t>
 
-<section>  <!-- 6.1 -->
+<section anchor="canonical">  <!-- 6.1 -->
   <name>Canonical representation</name>
 
 <t>This canonical representation is used for digital signature
@@ -693,7 +718,7 @@ transport mode:</t>
 <sourcecode>
     (1:a1:b1:c)
 
-    {KDE6YTE6YjE6YykA}
+    {KDE6YTE6YjE6YykK}
 </sourcecode>
 
 <t>The second example above is the same S-expression as the first
@@ -715,9 +740,9 @@ flexible and readable notations for documentation, design, debugging,
 and (in some cases) user interface.</t>
 
 <t>The advanced transport representation allows all of the
-representation forms described above, include quoted strings, base-64
-and hexadecimal representation of strings, tokens, representations of
-strings with omitted lengths, and so on.</t>
+representation forms described above in Section 4, include quoted
+strings, base-64 and hexadecimal representation of strings, tokens,
+representations of strings with omitted lengths, and so on.</t>
 
 </section>
 
@@ -735,54 +760,71 @@ We use the following notation:</t>
     parentheses   are used for grouping, as in (<x> | <y>)*
 ]]> </sourcecode>
 
-<t>For canonical and basic transport:</t>
+<t>For canonical transport:</t>
 
 <sourcecode> <![CDATA[
 <sexpr>         :: <string> | <list>
-<string>        :: <display>? <simple-string> ;
-<simple-string> :: <raw> ;
-<display>       :: "[" <simple-string> "]" ;
-<raw>           :: <decimal> ":" <bytes> ;
-<decimal>       :: <decimal-digit>+ ;
-    -- decimal numbers should have no unnecessary leading zeros
+<string>        :: <display>? <simple-string>
+<simple-string> :: <raw>
+<display>       :: "[" <simple-string> "]"
+<raw>           :: <decimal> ":" <bytes>
+<decimal>       :: "0" | ("1"..."9")("0"..."9")*
 <bytes>         -- any string of bytes, of the indicated length
-<list>          :: "(" <sexp>* ")" ;
-<decimal-digit> :: "0" | ... | "9" ;
+<list>          :: "(" <sexp>* ")"
+]]> </sourcecode>
+
+<t>For basic transport:</t>
+
+<sourcecode> <![CDATA[
+<sexpr>         :: <canonical> | <base-64>
+<canonical>     :: <string> | <list>
+<string>        :: <display>? <simple-string>
+<simple-string> :: <raw>
+<display>       :: "[" <simple-string> "]"
+<raw>           :: <decimal> ":" <bytes>
+<decimal>       :: "0" | ("1"..."9")("0"..."9")*
+<bytes>         -- any string of bytes, of the indicated length
+<list>          :: "(" <canonical>* ")"
+<base-64>       :: "{" <base-64-char>* "}"
+<base-64-char>  :: <alpha> | <decimal-digit> |
+                       "+" | "/" | "=" ;
+<alpha>         :: <upper-case> | <lower-case>
+<lower-case>    :: "a" | ... | "z" ;
+<upper-case>    :: "A" | ... | "Z" ;
 ]]> </sourcecode>
 
 <t>For advanced transport:</t>
 
 <sourcecode> <![CDATA[
 <sexpr>         :: <string> | <list>
-<string>        :: <display>? <simple-string> ;
+<string>        :: <display>? <simple-string>
 <simple-string> :: <raw> | <token> | <base-64> |
-                       <hexadecimal> | <quoted-string> ;
-<display>       :: "[" <simple-string> "]" ;
-<raw>           :: <decimal> ":" <bytes> ;
-<decimal>       :: <decimal-digit>+ ;
-    -- decimal numbers should have no unnecessary leading zeros
+                       <hexadecimal> | <quoted-string>
+<display>       :: "[" <whitespce> <simple-string>
+                       <whitespace> "]"
+<raw>           :: <decimal> ":" <bytes>
+<decimal>       :: "0" | ("1"..."9")("0"..."9")*
 <bytes>         -- any string of bytes, of the indicated length
-<token>         :: <tokenchar>+ ;
+<token>         :: (<alpha> | <simple-punct>) (<alpha> |
+                       <decimal-digit> | <simple-punct> )*
 <base-64>       :: <decimal>? "|"( <base-64-char> |
-                       <whitespace> )* "|" ;
-<hexadecimal>   :: "#" ( <hex-digit> | <white-space> )* "#" ;
+                       <whitespace> )* "|"
+<hexadecimal>   :: "#" ( <hex-digit> | <white-space> )* "#"
 <quoted-string> :: <decimal>? <quoted-string-body>
 <quoted-string-body> :: "\"" <bytes> "\""
-<list>          :: "(" ( <sexp> | <whitespace> )* ")" ;
-<whitespace>    :: <whitespace-char>* ;
-<token-char>    :: <alpha> | <decimal-digit> | <simple-punc> ;
-<alpha>         :: <upper-case> | <lower-case> | <digit> ;
+<list>          :: "(" <whitespace> <sexp>* <whitespace> ")"
+<whitespace>    :: <whitespace-char>*
+<alpha>         :: <upper-case> | <lower-case>
 <lower-case>    :: "a" | ... | "z" ;
 <upper-case>    :: "A" | ... | "Z" ;
 <decimal-digit> :: "0" | ... | "9" ;
 <hex-digit>     :: <decimal-digit> |
-                       "A" | ... | "F" | "a" | ... | "f" ;
+                       "A" | ... | "F" | "a" | ... | "f"
 <simple-punc>   :: "-" | "." | "/" | "_" |
-                       ":" | "*" | "+" | "=" ;
-<whitespace-char> :: " " | "\t" | "\r" | "\n" ;
+                       ":" | "*" | "+" | "="
+<whitespace-char> :: " " | "\t" | "\r" | "\n" | "\v" | "\f"
 <base-64-char>  :: <alpha> | <decimal-digit> |
-                       "+" | "/" | "=" ;
-<null>          :: "" ;
+                       "+" | "/" | "="
 ]]> </sourcecode>
 
 </section>  <!-- 7. -->
@@ -791,8 +833,8 @@ We use the following notation:</t>
   <name>In-memory representations</name>
 
 <t>For processing, the S-expression would typically be parsed and
-represented in memory in a more more amenable to efficient processing.
-We suggest two alternatives:</t>
+represented in memory in a way that is more amenable to efficient
+processing.  We suggest two alternatives:</t>
 
 <ul>
 <li>"list-structure"</li>
@@ -916,18 +958,26 @@ length.</t>
 
 </section>  <!-- 8. -->
 
-<section>  <!-- 9. -->
+<section anchor="Code">  <!-- 9. -->
   <name>Code</name>
 
-<t>There is code available for reading and parsing the various
-S-expression formats proposed here.</t>
+<t>At this time there is code available that is intended to read and parse
+some or all of the various S-expression formats specified here. In
+particular, see the following likely incomplete list:</t>
 
-<t>See http://theory.lcs.mit.edu/~rivest/sexp.html</t>
+<ul>
+  <li>Project GNU's <xref target="Libgcrypt"/>.</li>
+  <li>Github project of J. P. Malkiewicz <xref
+  target="SexpCode"/>.</li>
+</ul>
 
 </section>  <!-- 9. -->
 
 <section>  <!-- 10. -->
   <name>Utilization of S-expressions</name>
+
+<t>S-expressions are used in <xref target="SPKI"/> specified in <xref
+target="RFC2693"/>.</t>
 
 <t>This note has described S-expressions in general form.  Application
 writers may wish to restrict their use of S-expressions in various
@@ -947,37 +997,21 @@ considered:</t>
 </section>
 
 <section>  <!-- 11. -->
-  <name>Historical note</name>
-
-<t>The S-expression technology described here was originally developed
-for "SDSI" (the Simple Distributed Security Infrastructure by Lampson
-and Rivest <xref target="SDSI"/>) in 1996, although the origins
-clearly date back to McCarthy's LISP programming language.  It was
-further refined and improved during the merger of SDSI and SPKI <xref
-target="SPKI"/> during the first half of 1997.  S-expressions are
-similar to, but more readable and flexible than, Bernstein's
-"net-strings" <xref target="BERN"/>.</t>
-
-<t>Although made publicly available as a file named
-draft-rivest-sexp-00.txt on 4 May 1997, this document was not actually
-submitted to the IETF as that time. This is a modernized version of
-that file.</t>
-
-</section>
-
-<section>  <!-- 12. -->
   <name>IANA Considerations</name>
 
   <t>This document requires no IANA actions.</t>
 
+</section>  <!-- 11. -->
+
+<section>  <!-- 12. -->
+  <name>Security Considerations</name>
+
+<t>As a pure data representation format, there are few security
+considerations to S-expressions. A canonical form is required for the
+reliable verification of digital signatures and this is provided in
+<xref target="canonical"/>.</t>
+
 </section>  <!-- 12. -->
-
-<section>  <!-- 13. -->
-  <name>Security Consideration</name>
-
-<t>TBD</t>
-
-</section>  <!-- 13. -->
 
 </middle>
 
@@ -1011,6 +1045,40 @@ target="https://www.ietf.org/archive/id/draft-bernstein-netstrings-02.txt">
   <seriesInfo name="Work in" value="progress"/>
 </reference>
 
+<reference anchor="Libgcrypt"
+           target="https://www.gnupg.org/documentation/manuals/gcrypt/">
+  <front>
+    <title>The Libgcrypt Library</title>
+    <author>
+      <organization>GnuPG</organization>
+    </author>
+    <date year="2023" month="4" day="6"/>
+  </front>
+  <seriesInfo name="Libgcrypt version" value="1.10.2"/>
+</reference>
+
+<reference anchor="LISP">
+  <front>
+    <title>LISP 1.5 Programmer's Manual</title>
+    <author surname="Levin" initials="M."
+            fullname="Michael I. Levin">
+      <organization>The Computer Center and Research Laboratory of
+      Electronics, Massachusetts Institute of
+      Technology</organization> 
+    </author>
+    <author surname="McCarthy" initials="J."
+            fullname="John McCarthy"/>
+    <date year="1962" month="August" day="15"/>
+  </front>
+  <seriesInfo name="ISBN-13" value="978-0-262-12011-0"/>
+  <seriesInfo name="ISBN-10" value="0262130114"/>
+</reference>
+
+<xi:include
+    href="https://www.rfc-editor.org/refs/bibxml/reference.RFC.2692.xml"/>
+<xi:include
+    href="https://www.rfc-editor.org/refs/bibxml/reference.RFC.2693.xml"/>
+
 <reference anchor="SDSI"
   target="https://people.csail.mit.edu/rivest/pubs/RL96.ver-1.1.html">
   <front>
@@ -1025,6 +1093,16 @@ target="https://www.ietf.org/archive/id/draft-bernstein-netstrings-02.txt">
   <seriesInfo name="SDSI version" value="1.1"/>
 </reference>
 
+<reference anchor="SexpCode"
+           target="https://github.com/jpmalkiewicz/rivest-sexp">
+  <front>
+    <title>SEXP---(S-expressions)</title>
+    <author surname="Malkiewicz" initials="J."
+            fullname="J. P. Malkiewicz"/>
+    <date year="2015" month="6" day="10"/>
+  </front>
+</reference>
+
 <reference anchor="SPKI"
            target="http://www.clark.net/pub/cme/html/spki.html">
   <front>
@@ -1036,6 +1114,80 @@ target="https://www.ietf.org/archive/id/draft-bernstein-netstrings-02.txt">
 </reference>
 
 </references>
+
+<section>
+  <name>Change History</name>
+  
+<t>RFC Editor Note: Please delete this section before publication.</t>
+
+  <section>
+    <name>-00 Changes</name>
+
+<t>This sub-section summarizes significant changes between the
+original 1997 -00 version of this document and the 2023 version
+submited to the IETF.</t>
+
+<ol>
+  <li>Convert to XML v3.</li>
+  
+  <li>Update Ron Rivest author information and, with his permission,
+  add Donald Eastlake as an author.</li>
+  
+  <li>Add minimal "IANA Considerations" and "Security
+  Considerations" sections.</li>
+
+  <li>Since implementation requirements terminology is used, add the
+  usual paragraph about it as a sub-section of Section 1 and add
+  references to <xref target="RFC2119"/> and <xref
+  target="RFC8174"/>.</li> 
+  
+  <li>Divide references into Normative and Informational and update
+  base-64 reference to be to <xref target="RFC4648"/>.</li>
+
+  <li>Add a couple of sentence to the "Historical note" section about
+  the history of -00 versions of the draft.</li>
+</ol>
+
+  </section>  <!-- -00 -->
+
+  <section>
+    <name>Changes from -00 to -01</name>
+
+<ol>
+  <li>Fix glitches and errors in the BNF.</li>
+
+  <li>Add Acknowledgements section to list Marc Petit-Huguenin (who
+  provided BNF improvements) and John Klensin.</li>
+  
+  <li>Update code references in <xref target="Code"/> and add to
+  Informative References section. Note: The code
+  in the Malkiewicz github repository may be the code that was
+  originally at http://theory.lcs.mit.edu/~rivest/sexp.html </li>
+
+  <li>Add this Change History Appendix.</li>
+
+  <li>Move "Historical Notes" which were formerly a separate section
+  at the end of the document up to be a sub-section of Section 1.</li>
+
+  <li>Add references to <xref target="LISP"/>, <xref
+  target="RFC2692"/>, and <xref target="RFC2693"/>.</li>
+
+  <li>Add simple security considerations.</li>
+  
+  <li>Minor editorial fixes/improvements.</li>
+</ol>
+
+  </section>
+  
+</section>
+
+<section anchor="Acknowledgements" numbered="false">
+  <name>Acknowledgements</name>
+  
+<t>The comments and suggestions of the following are gratefully
+acknowledged: Marc Petit-Huguenin, John Klensin.</t>
+
+</section>
 
 </back>
 
