@@ -8,7 +8,6 @@ title: S-Expressions
 area: Applications and Real Time
 wg: Network Working Group
 kw: Sexp
-date: 2023-07-08
 author:
 - ins: R. Rivest
   name: Ronald L. Rivest
