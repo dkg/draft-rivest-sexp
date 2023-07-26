@@ -127,11 +127,11 @@ S-expressions.  Here is a sample S-expression:
 It is a list of length three:
 
 
-* the octet-string "snicker"
+- the octet-string "snicker"
 
-* the octet-string "abc"
+- the octet-string "abc"
 
-* a sub-list containing two elements: the hexadecimal constant
+- a sub-list containing two elements: the hexadecimal constant
   #03# and the base-64 constant \|YWJj\| (which is the same as
   "abc")
 
@@ -173,26 +173,26 @@ efficiency:
 The Sections of this document cover material as follows:
 
 
-* Section 2 gives an introduction to S-expressions.
+- Section 2 gives an introduction to S-expressions.
 
-* Section 3 discusses the character sets used.
+- Section 3 discusses the character sets used.
 
-* Section 4 presents the various representations of octet-strings.
+- Section 4 presents the various representations of octet-strings.
 
-* Section 5 describes how to represent lists.
+- Section 5 describes how to represent lists.
 
-* Section 6 discusses how S-expressions are represented for various
+- Section 6 discusses how S-expressions are represented for various
   uses.
 
-* Section 7 gives an ABNF syntax for S-expressions.
+- Section 7 gives an ABNF syntax for S-expressions.
 
-* Section 8 talks about how S-expressions might be represented in
+- Section 8 talks about how S-expressions might be represented in
   memory.
 
-* Section 9 briefly describes implementations for handling
+- Section 9 briefly describes implementations for handling
   S-expressions.
 
-* Section 10 discusses how applications might utilize
+- Section 10 discusses how applications might utilize
   S-expressions.
 
 ## Historical Notes
@@ -224,9 +224,9 @@ this document were changing the original BNF notation to ABNF {{RFC5234}}
 Informally, an S-expression is either:
 
 
-* an octet-string, or
+- an octet-string, or
 
-* a finite list of simpler S-expressions.
+- a finite list of simpler S-expressions.
 
 An octet-string is a finite sequence of eight-bit octets.  There
 may be many different but equivalent ways of representing an
@@ -264,15 +264,15 @@ restrictions.  The following are the target cases we aim to
 handle:
 
 
-* a "transport" or "basic" encoding for transporting the
+- a "transport" or "basic" encoding for transporting the
   S-expression between computers.
 
-* a "canonical" encoding, used when signing the
+- a "canonical" encoding, used when signing the
   S-expression.
 
-* an "advanced" encoding used for input/output to people.
+- an "advanced" encoding used for input/output to people.
 
-* an "in-memory" encoding used for processing the S-expression
+- an "in-memory" encoding used for processing the S-expression
   in the computer.
 
 These need not be different; in this proposal the canonical encoding
@@ -371,12 +371,12 @@ that the octet-string may have length zero.
 A verbatim encoding of an octet string consists of three parts:
 
 
-* the length (number of octets) of the octet-string, given in
+- the length (number of octets) of the octet-string, given in
   decimal, most significant digit first, with no leading zeros.
 
-* a colon ":"
+- a colon ":"
 
-* the octet string itself, verbatim.
+- the octet string itself, verbatim.
 
 There are no blanks or whitespace separating the parts.  No "escape
 sequences" are interpreted in the octet string.  This encoding is also
@@ -399,13 +399,13 @@ Here are some sample verbatim encodings:
 The quoted-string representation of an octet-string consists of:
 
 
-* an optional decimal length field
+- an optional decimal length field
 
-* an initial double-quote (")
+- an initial double-quote (")
 
-* the octet string with "C" escape conventions (\n, etc)
+- the octet string with "C" escape conventions (\n, etc)
 
-* a final double-quote (")
+- a final double-quote (")
 
 The specified length is the length of the resulting string after any
 escape sequences have been handled.  The string does not have any
@@ -465,9 +465,9 @@ An octet string that meets the following conditions may be given
 directly as a "token".
 
 
-* it does not begin with a digit
+- it does not begin with a digit
 
-* it contains only characters that are: alphabetic (upper or lower
+- it contains only characters that are: alphabetic (upper or lower
   case); numeric; or one of the eight "pseudo-alphabetic" punctuation
   marks:
 
@@ -496,15 +496,15 @@ An octet-string may be represented with a hexadecimal encoding
 consisting of:
 
 
-* an (optional) decimal length of the octet string
+- an (optional) decimal length of the octet string
 
-* a  sharp-sign "#"
+- a  sharp-sign "#"
 
-* a hexadecimal encoding of the octet string, with each octet
+- a hexadecimal encoding of the octet string, with each octet
   represented with two hexadecimal digits, most significant digit
   first. There MUST be an even number of such digits.
 
-* a sharp-sign "#"
+- a sharp-sign "#"
 
 There may be whitespace inserted in the midst of the hexadecimal
 encoding arbitrarily; it is ignored.  It is an error to have
@@ -525,14 +525,14 @@ Here are some examples of hexadecimal encodings:
 An octet-string may be represented in a base-64 coding {{RFC4648}} consisting of:
 
 
-* an (optional) decimal length of the octet string
+- an (optional) decimal length of the octet string
 
-* a vertical bar "\|"
+- a vertical bar "\|"
 
-* the base-64 {{RFC4648}} encoding of the octet
+- the base-64 {{RFC4648}} encoding of the octet
   string.
 
-* a final vertical bar "\|"
+- a final vertical bar "\|"
 
 The base-64 encoding uses only the characters
 
@@ -640,11 +640,11 @@ Here are some examples of encodings of lists:
 There are three "types" of representations:
 
 
-* canonical
+- canonical
 
-* basic transport
+- basic transport
 
-* advanced transport
+- advanced transport
 
 The first two MUST be supported by any implementation; the last is
 OPTIONAL.
@@ -679,9 +679,9 @@ S-expressions:
 There are two forms of the "basic transport" representation:
 
 
-* the canonical representation
+- the canonical representation
 
-* an {{RFC4648}} base-64 representation of the canonical
+- an {{RFC4648}} base-64 representation of the canonical
   representation, surrounded by braces.
 
 The transport mechanism is intended to provide a universal means of
@@ -820,9 +820,9 @@ represented in memory in a way that is more amenable to efficient
 processing.  We suggest two alternatives:
 
 
-* "list-structure"
+- "list-structure"
 
-* "array-layout"
+- "array-layout"
 
 We only sketch these here, as they are only suggestive.  The code
 referenced below illustrates these styles in more detail.
@@ -936,9 +936,9 @@ some or all of the various S-expression formats specified here. In
 particular, see the following likely incomplete list:
 
 
-* Project GNU's {{Libgcrypt}}.
+- Project GNU's {{Libgcrypt}}.
 
-* Github project of J. P. Malkiewicz {{SexpCode}}.
+- Github project of J. P. Malkiewicz {{SexpCode}}.
 
 
 # Utilization of S-expressions
@@ -951,19 +951,19 @@ ways.  Here are some possible restrictions that might be
 considered:
 
 
-* no display-hints
+- no display-hints
 
-* no lengths on hexadecimal, quoted-strings, or base-64 encodings
+- no lengths on hexadecimal, quoted-strings, or base-64 encodings
 
-* no empty lists
+- no empty lists
 
-* no empty octet-strings
+- no empty octet-strings
 
-* no lists having another list as its first element
+- no lists having another list as its first element
 
-* no base-64 or hexadecimal encodings
+- no base-64 or hexadecimal encodings
 
-* fixed limits on the size of octet-strings
+- fixed limits on the size of octet-strings
 
 
 # IANA Considerations
