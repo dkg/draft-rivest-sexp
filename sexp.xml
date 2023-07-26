@@ -1,0 +1,1042 @@
+<?XML333 version="1.0" encoding="utf-8"?>
+<?xml-model href="rfc7991bis.rnc"?>  <!-- Required for schema
+      validation and schema-aware editing -->
+
+<!DOCTYPE rfc [
+  <!ENTITY filename "draft-rivest-sexp-00">
+  <!ENTITY nbsp     "&#160;">
+  <!ENTITY zwsp     "&#8203;">
+  <!ENTITY nbhy     "&#8209;">
+  <!ENTITY wj       "&#8288;">
+]>
+<!-- <?xml-stylesheet type="text/xsl" href="rfc2629.xslt" ?> -->
+<!-- This third-party XSLT can be enabled for direct transformations
+in XML processors, including most browsers -->
+<!-- If further character entities are required then they should be
+added to the DOCTYPE above. Use of an external entity file is not
+recommended. -->
+<?rfc strict="yes" ?>
+<!-- give errors regarding ID-nits and DTD validation -->
+<!-- control the table of contents (ToC) -->
+<?rfc toc="yes"?>
+
+<rfc
+  xmlns:xi="http://www.w3.org/2001/XInclude"
+  category="info"
+  docName="&filename;"
+  ipr="trust200902"
+  obsoletes=""
+  submissionType="IETF"
+  xml:lang="en"
+  version="3">
+<!--
+    * docName should be the name of your draft * category should be
+    one of std, bcp, info, exp, historic * ipr should be one of
+    trust200902, noModificationTrust200902, noDerivativesTrust200902,
+    pre5378Trust200902 * updates can be an RFC number as NNNN *
+    obsoletes can be an RFC number as NNNN
+-->
+
+
+<!-- ____________________FRONT_MATTER____________________ -->
+<front>
+   <title>S-Expressions</title>
+   <!--  The abbreviated title is required if the full title is
+        longer than 39 characters -->
+
+   <seriesInfo name="Internet-Draft"
+               value="&filename;"/>
+
+      <author fullname="Ronald L. Rivest" initials="R."
+           surname="Rivest">
+     <organization>MIT CSAIL</organization>
+     <address>
+       <postal>
+         <street>32 Vassar Street, Room 32-G692</street>
+         <city>Cambridge</city>
+         <region>Massachusetts</region>
+         <code>02139</code>
+         <country>USA</country>
+       </postal>
+       <email>rivest@mit.edu</email>
+       <uri>https://www.csail.mit.edu/person/ronald-l-rivest</uri>
+     </address>
+   </author>
+
+   <author fullname="Donald E. Eastlake 3rd" initials="D."
+           surname="Eastlake">
+     <organization>Futurewei Technologies</organization>
+     <address>
+       <postal>
+         <street>2386 Panoramic Circle</street>
+         <city>Apopka</city>
+         <region>Florida</region>
+         <code>32703</code>
+         <country>US</country>
+       </postal>
+       <phone>+1-508-333-2270</phone>
+       <email>d3e3e3@gmail.com</email>
+     </address>
+   </author>
+
+   <date year="2023" month="5" day="25"/>
+
+<area>Applications and Real Time</area>
+<workgroup>Network Working Group</workgroup>
+   <!-- "Internet Engineering Task Force" is fine for individual
+        submissions.  If this element is not present, the default is
+        "Network Working Group", which is used by the RFC Editor as a
+        nod to the history of the RFC Series. -->
+
+<keyword></keyword>
+   <!-- Multiple keywords are allowed.  Keywords are incorporated
+        into HTML output files for use by search engines. -->
+
+<abstract>
+  <t>This memo describes a data structure called "S-expressions" that
+  are suitable for representing arbitrary complex data structures.  We
+  make precise the encodings of S-expressions: we give a "canonical
+  form" for S-expressions, described two "transport" representations,
+  and also describe an "advanced" format for display to people.</t>
+</abstract>
+
+</front>
+
+
+<!-- ____________________MIDDLE_MATTER____________________ -->
+<middle>
+
+<section> <!-- 1. -->
+  <name>Introduction</name>
+
+  <t>S-expressions are data structures for representing complex data.
+  They are either byte-strings ("octet-strings") or lists of simpler
+  S-expressions.  Here is a sample S-expression:</t>
+
+<sourcecode>
+    (snicker "abc" (#03# |YWJj|))
+</sourcecode>
+
+<t>It is a list of length three: </t>
+
+<ul>
+  <li>the octet-string "snicker"</li>
+
+  <li>the octet-string "abc"</li>
+
+  <li>a sub-list containing two elements: the hexadecimal constant
+  #03# and the base-64 constant |YWJj| (which is the same as
+  "abc")</li>
+</ul>
+
+  <t>This note gives a specific proposal for constructing and
+  utilizing S-expressions.  The proposal is independent of any
+  particular application.</t>
+
+  <dl>
+
+<dt>Here are the design goals for S-expressions:</dt><dd></dd>
+
+<dt>generality:</dt><dd>S-expressions should be good at representing
+arbitrary data.</dd>
+
+<dt>readability:</dt><dd>it should be easy for someone to examine and
+understand the structure of an S-expression.</dd>
+
+<dt>economy:</dt><dd>S-expressions should represent data compactly.</dd>
+
+<dt>tranportability:</dt><dd>S-expressions should be easy to transport
+over communication media (such as email) that are known to be less
+than perfect.</dd>
+
+<dt>flexibility:</dt><dd>S-expressions should make it relatively
+simple to modify and extend data structures.</dd>
+
+<dt>canonicalization:</dt><dd>it should be easy to produce a unique
+"canonical" form of an S-expression, for digital signature purposes.</dd>
+
+<dt>efficiency:</dt><dd>S-expressions should admit in-memory
+representations that allow efficient processing.</dd>
+
+</dl>
+
+<t>Section 2 gives an introduction to S-expressions.</t>
+<t>Section 3 discusses the character sets used.</t>
+<t>Section 4 presents the various representations of octet-strings.</t>
+<t>Section 5 describes how to represent lists.</t>
+<t>Section 6 discusses how S-expressions are represented for various uses.</t>
+<t>Section 7 gives a BNF syntax for S-expressions.</t>
+<t>Section 8 talks about how S-expressions might be represented in memory.</t>
+<t>Section 9 briefly describes implementations for handling S-expressions.</t>
+<t>Section 10 discusses how applications might utilize S-expressions.</t>
+<t>Section 11 gives historical notes on S-expressions.</t>
+<t>Section 12 gives references.</t>
+
+<section> <!-- 1.1 -->
+  <name>Conventions Used in This Document</name>
+
+<t>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+"SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+"OPTIONAL" in this document are to be interpreted as described in BCP
+14 <xref target="RFC2119"/> <xref target="RFC8174"/> when, and only
+when, they appear in all capitals, as shown here.</t>
+
+</section>  <!-- 1.1 -->
+
+</section> <!-- end 1. Introduction -->
+
+<section> <!-- 2. -->
+  <name>S-expressions -- informal introduction</name>
+
+  <t>Informally, an S-expression is either:</t>
+
+<ul spacing="compact">
+  <li>an octet-string, or</li>
+  <li>a finite list of simpler S-expressions.</li>
+</ul>
+
+<t>An octet-string is a finite sequence of eight-bit octets.  There
+may be many different but equivalent ways of representing an
+octet-string</t>
+
+<dl spacing="compact">
+
+<dt>abc&nbsp;&nbsp;&nbsp;</dt><dd>-- as a token</dd>
+
+<dt>"abc"&nbsp;</dt><dd>-- as a quoted string</dd>
+
+<dt>#616263#</dt><dd>-- as a hexadecimal string</dd>
+
+<dt>3:abc&nbsp;</dt><dd>-- as a length-prefixed "verbatim"
+encoding</dd>
+
+<dt>{MzphYmM=}</dt><dd>-- as a base-64 encoding of the verbatim
+encoding (that is, an encoding of "3:abc")</dd>
+
+<dt>|YWJj|</dt><dd>-- as a base-64 encoding of the octet-string
+"abc"</dd>
+
+</dl>
+
+<t>These encodings are all equivalent; they all denote the same octet
+string.</t>
+
+<t>We will give details of these encodings later on, and also describe
+how to give a "display type" to a byte string.</t>
+
+<t>A list is a finite sequence of zero or more simpler S-expressions.
+A list may be represented by using parentheses to surround the
+sequence of encodings of its elements, as in:</t>
+
+<sourcecode>
+    (abc (de #6667#) "ghi jkl")
+</sourcecode>
+
+<t>As we see, there is variability possible in the encoding of an
+S-expression.  In some cases, it is desirable to standardize or
+restrict the encodings; in other cases it is desirable to have no
+restrictions.  The following are the target cases we aim to
+handle:</t>
+
+<ul>
+
+  <li>a "transport" encoding for transporting the S-expression between
+  computers.</li>
+
+  <li>a "canonical" encoding, used when signing the
+  S-expression.</li>
+
+  <li>an "advanced" encoding used for input/output to people.</li>
+
+  <li>an "in-memory" encoding used for processing the S-expression
+  in the computer.</li>
+
+</ul>
+
+<t>These need not be different; in this proposal the canonical encoding
+is the same as the transport encoding, for example.  In this note we
+propose (related) encoding techniques for each of these uses.</t>
+
+</section>
+
+<section>  <!-- 3. -->
+  <name>Character set</name>
+
+<t>We will be describing encodings of S-expressions.  Except when giving
+"verbatim" encodings, the character set used is limited to the following
+characters in US-ASCII:</t>
+
+<dl spacing="compact">
+
+  <dt>Alphabetic:</dt><dd>
+  <sourcecode>A B ... Z a b ... z</sourcecode></dd>
+
+  <dt>numeric:</dt><dd>
+  <sourcecode>0 1 ... 9</sourcecode></dd>
+
+  <dt>whitespace:</dt><dd>
+  <sourcecode>space, horizontal tab, vertical tab, form-feed
+  carriage-return, line-feed</sourcecode></dd>
+
+  <dt>The following graphics characters, which we call
+  "pseudo-alphabetic":</dt><dd>
+<sourcecode>
+    - hyphen or minus
+    . period
+    / slash
+    _ underscore
+    : colon
+    * asterisk
+    + plus
+    = equal
+</sourcecode>
+  </dd>
+
+<dt>The following graphics characters, which are "reserved
+  punctuation":</dt><dd>
+<sourcecode> <![CDATA[
+    ( left parenthesis
+    ) right parenthesis
+    [ left bracket
+    ] right bracket
+    { left brace
+    } right brace
+    | vertical bar
+    # number sign
+    " double quote
+    & ampersand
+    \ backslash
+]]> </sourcecode>
+  </dd>
+
+  <dt>The following characters are unused and unavailable, except in
+        "verbatim" encodings:</dt><dd>
+<sourcecode> <![CDATA[
+    ! exclamation point
+    % percent
+    ^ circumflex
+    ~ tilde
+    ; semicolon
+    ' apostrophe
+    , comma
+    < less than
+    > greater than
+    ? question mark
+]]> </sourcecode>
+  </dd>
+
+</dl>
+
+</section> <!-- 3 -->
+
+<section>  <!-- 4. -->
+  <name>Octet string representations</name>
+
+<t>This section describes in detail the ways in which an octet-string may
+be represented.</t>
+
+<t>We recall that an octet-string is any finite sequence of octets, and
+that the octet-string may have length zero.</t>
+
+  <section>  <!-- 4.1 -->
+    <name>Verbatim representation</name>
+
+<t>A verbatim encoding of an octet string consists of four parts:</t>
+
+<ul>
+
+  <li>the length (number of octets) of the octet-string, given in
+  decimal most significant digit first, with no leading zeros.</li>
+
+  <li>a colon ":"</li>
+
+  <li>the octet string itself, verbatim.</li>
+
+</ul>
+
+<t>There are no blanks or whitespace separating the parts.  No "escape
+sequences" are interpreted in the octet string.  This encoding is also
+called a "binary" or "raw" encoding.</t>
+
+<t>Here are some sample verbatim encodings:</t>
+
+<sourcecode>
+    3:abc
+    7:subject
+    4:::::
+    12:hello world!
+    10:abcdefghij
+    0:
+</sourcecode>
+
+</section> <!-- 4.1 -->
+
+<section>  <!-- 4.2 -->
+  <name>Quoted-string representation</name>
+
+<t>The quoted-string representation of an octet-string consists of:</t>
+
+<ul>
+
+  <li>an optional decimal length field</li>
+
+  <li>an initial double-quote (")</li>
+
+  <li>the octet string with "C" escape conventions (\n, etc)</li>
+
+  <li>a final double-quote (")</li>
+
+</ul>
+
+<t>The specified length is the length of the resulting string after any
+escape sequences have been handled.  The string does not have any
+"terminating NULL" that C includes, and the length does not count such
+a character.</t>
+
+<t>The length is optional.</t>
+
+<t>The escape conventions within the quoted string are as follows
+(these follow the "C" programming language conventions, with an
+extension for ignoring line terminators of just LF or CRLF):</t>
+
+<sourcecode>
+    \b      -- backspace
+    \t      -- horizontal tab
+    \v      -- vertical tab
+    \n      -- new-line
+    \f      -- form-feed
+    \r      -- carriage-return
+    \"      -- double-quote
+    \'      -- single-quote
+    \\      -- back-slash
+    \ooo     -- character with octal value ooo (all three digits
+must be present)
+    \xhh     -- character with hexadecimal value hh (both digits
+must be present)
+    \&lt;carriage-return&gt;   -- causes carriage-return to be
+ignored.
+    \&lt;line-feed&gt;         -- causes linefeed to be ignored
+    \&lt;carriage-return&gt;&lt;line-feed&gt;   -- causes CRLF
+to be ignored.
+    \&lt;line-feed&gt;&lt;carriage-return&gt;   -- causes LFCR
+to be ignored.
+</sourcecode>
+
+<t>Here are some examples of quoted-string encodings:</t>
+
+<sourcecode>
+    "subject"
+    "hi there"
+    7"subject"
+    3"\n\n\n"
+    "This has\n two lines."
+    "This has\
+    one."
+    ""
+</sourcecode>
+
+</section> <!-- 4.2 -->
+
+<section> <!-- 4.3 -->
+  <name>Token representation</name>
+
+<t>An octet string that meets the following conditions may be given
+directly as a "token".</t>
+
+<ul>
+
+  <li>it does not begin with a digit</li>
+
+  <li>it contains only characters that are: alphabetic (upper or lower
+  case); numeric; or one of the eight "pseudo-alphabetic" punctuation
+  marks:</li>
+</ul>
+<sourcecode>        -   .   /   _   :  *  +  =</sourcecode>
+
+<t>(Note: upper and lower case are not equivalent.)</t>
+<t>(Note: A token may begin with punctuation, including ":").</t>
+
+<t>Here are some examples of token representations:</t>
+
+<sourcecode>
+    subject
+    not-before
+    class-of-1997
+    //microsoft.com/names/smith
+    *
+</sourcecode>
+
+</section>  <!-- 4.3 -->
+
+<section>  <!-- 4.4 -->
+  <name>Hexadecimal representation</name>
+
+<t>An octet-string may be represented with a hexadecimal encoding
+consisting of:</t>
+
+<ul>
+
+  <li>an (optional) decimal length of the octet string</li>
+
+  <li>a  sharp-sign "#"</li>
+
+  <li>a hexadecimal encoding of the octet string, with each octet
+  represented with two hexadecimal digits, most significant digit
+  first.</li>
+
+  <li>a sharp-sign "#"</li>
+
+</ul>
+
+<t>There may be whitespace inserted in the midst of the hexadecimal
+encoding arbitrarily; it is ignored.  It is an error to have
+characters other than whitespace and hexadecimal digits.</t>
+
+<t>Here are some examples of hexadecimal encodings:</t>
+
+<sourcecode>
+    #616263#    -- represents "abc"
+    3#616263#   -- also represents "abc"
+    # 616
+      263 #     -- also represents "abc"
+</sourcecode>
+
+</section>  <!-- 4.4 -->
+
+<section>  <!-- 4.5 -->
+  <name>Base-64 representation</name>
+
+<t>An octet-string may be represented in a base-64 coding <xref
+target="RFC4648"/> consisting of:</t>
+
+<ul>
+<li>an (optional) decimal length of the octet string</li>
+
+<li>a vertical bar "|"</li>
+
+<li>the rfc 1521 base-64 encoding of the octet string.</li>
+
+<li>a final vertical bar "|"</li>
+</ul>
+
+<t>The base-64 encoding uses only the characters </t>
+
+<sourcecode>
+    A-Z  a-z  0-9  +  /  =
+</sourcecode>
+
+<t>It produces four characters of output for each three octets of input.
+If the input has one or two left-over octets of input, it produces an
+output block of length four ending in two or one equals signs, respectively.
+Output routines compliant with this standard MUST output the equals signs
+as specified.  Input routines MAY accept inputs where the equals signs are
+dropped.</t>
+
+<t>There may be whitespace inserted in the midst of the base-64 encoding
+arbitrarily; it is ignored.  It is an error to have characters other
+than whitespace and base-64 characters.</t>
+
+<t>Here are some examples of base-64 encodings:</t>
+
+<sourcecode>
+    |YWJj|       -- represents "abc"
+    | Y W
+      J j |      -- also represents "abc"
+    3|YWJj|      -- also represents "abc"
+    |YWJjZA==|   -- represents "abcd"
+    |YWJjZA|     -- also represents "abcd"
+</sourcecode>
+
+</section>  <!-- 4.5 -->
+
+<section>  <!-- 4.6 -->
+  <name>Display hint</name>
+
+<t>Any octet string may be preceded by a single "display hint".</t>
+
+<t>The purposes of the display hint is to provide information on how
+to display the octet string to a user.  It has no other function.
+Many of the MIME types work here.</t>
+
+<t>A display-hint is an octet string surrounded by square brackets.
+There may be whitespace separating the octet string from the
+surrounding brackets.  Any of the legal formats may be used for the
+octet string.</t>
+
+<t>Here are some examples of display-hints:</t>
+
+<sourcecode>
+    [image/gif]
+    [URI]
+    [charset=unicode-1-1]
+    [text/richtext]
+    [application/postscript]
+    [audio/basic]
+    ["http://abc.com/display-types/funky.html"]
+</sourcecode>
+
+<t>In applications an octet-string that is untyped may be considered to have
+a pre-specified "default" mime type.  The mime type</t>
+
+<sourcecode>
+    "text/plain; charset=iso-8859-1"
+</sourcecode>
+
+<t>is the standard default.</t>
+
+</section>  <!-- 4.6 -->
+
+<section>  <!-- 4.7 -->
+  <name>Equality of octet-strings</name>
+
+<t>Two octet strings are considered to be "equal" if and only if they
+have the same display hint and the same data octet strings.</t>
+
+<t>Note that octet-strings are "case-sensitive"; the octet-string "abc"
+is not equal to the octet-string "ABC".</t>
+
+<t>An untyped octet-string can be compared to another octet-string (typed
+or not) by considering it as a typed octet-string with the default
+mime-type.</t>
+
+</section>  <!-- 4.7 -->
+
+</section>  <!-- 4. -->
+
+<section> <!-- 5. -->
+  <name>Lists</name>
+
+<t>Just as with octet-strings, there are several ways to represent an
+S-expression.  Whitespace may be used to separate list elements, but
+they are only required to separate two octet strings when otherwise
+the two octet strings might be interpreted as one, as when one token
+follows another.  Also, whitespace may follow the initial left
+parenthesis, or precede the final right parenthesis.</t>
+
+<t>Here are some examples of encodings of lists:</t>
+
+<sourcecode>
+    (a b c)
+
+    ( a ( b c ) ( ( d e ) ( e f ) )  )
+
+    (11:certificate(6:issuer3:bob)(7:subject5:alice))
+
+    ({3Rt=} "1997" murphy 3:{XC++})
+</sourcecode>
+
+</section>
+
+<section>  <!-- 6. -->
+  <name>Representation types</name>
+
+<t>There are three "types" of representations: </t>
+
+<ul>
+<li>canonical</li>
+
+<li>basic transport</li>
+
+<li>advanced transport</li>
+</ul>
+
+<t>
+The first two MUST be supported by any implementation; the last is
+optional.</t>
+
+<section>  <!-- 6.1 -->
+  <name>Canonical representation</name>
+
+<t>This canonical representation is used for digital signature
+purposes, transmission, etc.  It is uniquely defined for each
+S-expression.  It is not particularly readable, but that is not the
+point.  It is intended to be very easy to parse, to be reasonably
+economical, and to be unique for any S-expression.</t>
+
+<t>The "canonical" form of an S-expression represents each
+octet-string in verbatim mode, and represents each list with no blanks
+separating elements from each other or from the surrounding
+parentheses.</t>
+
+<t>Here are some examples of canonical representations of
+S-expressions:</t>
+
+<sourcecode>
+    (6:issuer3:bob)
+
+    (4:icon[12:image/bitmap]9:xxxxxxxxx)
+
+    (7:subject(3:ref5:alice6:mother))
+</sourcecode>
+
+</section>
+
+<section>  <!-- 6.2 -->
+  <name>Basic transport representation</name>
+
+<t>There are two forms of the "basic transport" representation:</t>
+
+<ul>
+  <li>the canonical representation</li>
+
+  <li>an <xref target="RFC4648"/> base-64 representation of the canonical
+  representation, surrounded by braces.</li>
+</ul>
+
+<t>The transport mechanism is intended to provide a universal means of
+representing S-expressions for transport from one machine to
+another.</t>
+
+<t>Here are some examples of an S-expression represented in basic
+transport mode:</t>
+
+<sourcecode>
+    (1:a1:b1:c)
+
+    {KDE6YTE6YjE6YykA}
+</sourcecode>
+
+<t>The second example above is the same S-expression as the first
+encoded in base-64.</t>
+
+<t>There is a difference between the brace notation for base-64 used
+here and the || notation for base-64'd octet-strings described above.
+Here the base-64 contents are converted to octets, and then re-scanned
+as if they were given originally as octets.  With the || notation, the
+contents are just turned into an octet-string.</t>
+
+</section>
+
+<section>  <!-- 6.3 -->
+  <name>Advanced transport representation</name>
+
+<t>The "advanced transport" representation is intended to provide more
+flexible and readable notations for documentation, design, debugging,
+and (in some cases) user interface.</t>
+
+<t>The advanced transport representation allows all of the
+representation forms described above, include quoted strings, base-64
+and hexadecimal representation of strings, tokens, representations of
+strings with omitted lengths, and so on.</t>
+
+</section>
+
+</section>  <!-- 6. -->
+
+<section>  <!-- 7. -->
+  <name>BNF for syntax</name>
+
+<t>We give separate BNF's for canonical and advanced forms of S-expressions.
+We use the following notation:</t>
+<sourcecode> <![CDATA[
+    <x>*          means 0 or more occurrences of <x>
+    <x>+          means 1 or more occurrences of <x>
+    <x>?          means 0 or 1 occurrences of <x>
+    parentheses   are used for grouping, as in (<x> | <y>)*
+]]> </sourcecode>
+
+<t>For canonical and basic transport:</t>
+
+<sourcecode> <![CDATA[
+<sexpr>         :: <string> | <list>
+<string>        :: <display>? <simple-string> ;
+<simple-string> :: <raw> ;
+<display>       :: "[" <simple-string> "]" ;
+<raw>           :: <decimal> ":" <bytes> ;
+<decimal>       :: <decimal-digit>+ ;
+    -- decimal numbers should have no unnecessary leading zeros
+<bytes>         -- any string of bytes, of the indicated length
+<list>          :: "(" <sexp>* ")" ;
+<decimal-digit> :: "0" | ... | "9" ;
+]]> </sourcecode>
+
+<t>For advanced transport:</t>
+
+<sourcecode> <![CDATA[
+<sexpr>         :: <string> | <list>
+<string>        :: <display>? <simple-string> ;
+<simple-string> :: <raw> | <token> | <base-64> |
+                       <hexadecimal> | <quoted-string> ;
+<display>       :: "[" <simple-string> "]" ;
+<raw>           :: <decimal> ":" <bytes> ;
+<decimal>       :: <decimal-digit>+ ;
+    -- decimal numbers should have no unnecessary leading zeros
+<bytes>         -- any string of bytes, of the indicated length
+<token>         :: <tokenchar>+ ;
+<base-64>       :: <decimal>? "|"( <base-64-char> |
+                       <whitespace> )* "|" ;
+<hexadecimal>   :: "#" ( <hex-digit> | <white-space> )* "#" ;
+<quoted-string> :: <decimal>? <quoted-string-body>
+<quoted-string-body> :: "\"" <bytes> "\""
+<list>          :: "(" ( <sexp> | <whitespace> )* ")" ;
+<whitespace>    :: <whitespace-char>* ;
+<token-char>    :: <alpha> | <decimal-digit> | <simple-punc> ;
+<alpha>         :: <upper-case> | <lower-case> | <digit> ;
+<lower-case>    :: "a" | ... | "z" ;
+<upper-case>    :: "A" | ... | "Z" ;
+<decimal-digit> :: "0" | ... | "9" ;
+<hex-digit>     :: <decimal-digit> |
+                       "A" | ... | "F" | "a" | ... | "f" ;
+<simple-punc>   :: "-" | "." | "/" | "_" |
+                       ":" | "*" | "+" | "=" ;
+<whitespace-char> :: " " | "\t" | "\r" | "\n" ;
+<base-64-char>  :: <alpha> | <decimal-digit> |
+                       "+" | "/" | "=" ;
+<null>          :: "" ;
+]]> </sourcecode>
+
+</section>  <!-- 7. -->
+
+<section>  <!-- 8. -->
+  <name>In-memory representations</name>
+
+<t>For processing, the S-expression would typically be parsed and
+represented in memory in a more more amenable to efficient processing.
+We suggest two alternatives:</t>
+
+<ul>
+<li>"list-structure"</li>
+
+<li>"array-layout"</li>
+</ul>
+
+<t>We only sketch these here, as they are only suggestive.  The code
+referenced below illustrates these styles in more detail.</t>
+
+<section>  <!-- 8.1 -->
+  <name>List-structure memory representation</name>
+
+<t>Here there are separate records for simple-strings, strings, and
+lists.  An S-expression of the form ("abc" "de") would require two
+records for the simple strings, two for the strings, and two for the
+list elements.  This is a fairly conventional representation, and
+details are omitted here.</t>
+
+</section>
+
+<section>  <!-- 8.2 -->
+  <name>Array-layout memory representation</name>
+
+<t>Here each S-expression is represented as a contiguous array of bytes.
+The first byte codes the "type" of the S-expression:</t>
+
+<sourcecode>
+    01   octet-string
+
+    02   octet-string with display-hint
+
+    03   beginning of list (and 00 is used for "end of list")
+</sourcecode>
+
+<t>Each of the three types is immediately followed by a k-byte integer
+indicating the size (in bytes) of the following representation.  Here
+k is an integer that depends on the implementation, it might be
+anywhere from 2 to 8, but would be fixed for a given implementation;
+it determines the size of the objects that can be handled.  The
+transport and canonical representations are independent of the choice
+of k made by the implementation.</t>
+
+<t>Although the length of lists are not given in the usual
+S-expression notations, it is easy to fill them in when parsing; when
+you reach a right-parenthesis you know how long the list
+representation was, and where to go back to fill in the missing
+length.</t>
+
+<section>  <!-- 8.2.1 -->
+  <name>Octet string</name>
+
+<t>This is represented as follows:</t>
+
+<sourcecode> <![CDATA[
+    01 <length> <octet-string>
+]]> </sourcecode>
+
+<t>For example (here k = 2)</t>
+
+<sourcecode>
+    01 0003 a b c
+</sourcecode>
+
+</section>
+
+<section>  <!-- 8.2.2 -->
+  <name>Octet-string with display-hint</name>
+
+<t>This is represented as follows:</t>
+
+<sourcecode> <![CDATA[
+    02 <length>
+      01 <length> <octet-string>    /* for display-type */
+      01 <length> <octet-string>    /* for octet-string */
+]]> </sourcecode>
+
+<t>For example, the S-expression </t>
+
+<sourcecode>
+    [gif] #61626364#
+</sourcecode>
+
+<t>would be represented as (with k = 2)</t>
+
+<sourcecode>
+    02 000d
+      01 0003  g  i  f
+      01 0004 61 62 63 64
+</sourcecode>
+
+</section>
+
+<section>  <!-- 8.2.3 -->
+  <name>List</name>
+
+<t>This is represented as</t>
+
+<sourcecode> <![CDATA[
+    03 <length> <item1> <item2> <item3> ... <itemn> 00
+]]> </sourcecode>
+
+<t>For example, the list (abc [d]ef (g)) is represented in memory as
+(with k=2)</t>
+
+<sourcecode>
+    03 001b
+      01 0003 a b c
+      02 0009
+        01 0001 d
+        01 0002 e f
+      03 0005
+        01 0001 g
+      00
+    00
+</sourcecode>
+
+</section>
+
+</section>  <!-- 8.2 -->
+
+</section>  <!-- 8. -->
+
+<section>  <!-- 9. -->
+  <name>Code</name>
+
+<t>There is code available for reading and parsing the various
+S-expression formats proposed here.</t>
+
+<t>See http://theory.lcs.mit.edu/~rivest/sexp.html</t>
+
+</section>  <!-- 9. -->
+
+<section>  <!-- 10. -->
+  <name>Utilization of S-expressions</name>
+
+<t>This note has described S-expressions in general form.  Application
+writers may wish to restrict their use of S-expressions in various
+ways.  Here are some possible restrictions that might be
+considered:</t>
+
+<ul>
+<li>no display-hints</li>
+<li>no lengths on hexadecimal, quoted-strings, or base-64 encodings</li>
+<li>no empty lists</li>
+<li>no empty octet-strings</li>
+<li>no lists having another list as its first element</li>
+<li>no base-64 or hexadecimal encodings</li>
+<li>fixed limits on the size of octet-strings</li>
+</ul>
+
+</section>
+
+<section>  <!-- 11. -->
+  <name>Historical note</name>
+
+<t>The S-expression technology described here was originally developed
+for "SDSI" (the Simple Distributed Security Infrastructure by Lampson
+and Rivest <xref target="SDSI"/>) in 1996, although the origins
+clearly date back to McCarthy's LISP programming language.  It was
+further refined and improved during the merger of SDSI and SPKI <xref
+target="SPKI"/> during the first half of 1997.  S-expressions are
+similar to, but more readable and flexible than, Bernstein's
+"net-strings" <xref target="BERN"/>.</t>
+
+<t>Although made publicly available as a file named
+draft-rivest-sexp-00.txt on 4 May 1997, this document was not actually
+submitted to the IETF as that time. This is a modernized version of
+that file.</t>
+
+</section>
+
+<section>  <!-- 12. -->
+  <name>IANA Considerations</name>
+
+  <t>This document requires no IANA actions.</t>
+
+</section>  <!-- 12. -->
+
+<section>  <!-- 13. -->
+  <name>Security Consideration</name>
+
+<t>TBD</t>
+
+</section>  <!-- 13. -->
+
+</middle>
+
+
+<!-- ____________________BACK_MATTER____________________ -->
+<back>
+
+<references>
+  <name>Normative References</name>
+
+<xi:include
+    href="https://www.rfc-editor.org/refs/bibxml/reference.RFC.2119.xml"/>
+<xi:include
+    href="https://www.rfc-editor.org/refs/bibxml/reference.RFC.4648.xml"/>
+<xi:include
+    href="https://www.rfc-editor.org/refs/bibxml/reference.RFC.8174.xml"/>
+
+</references>
+
+<references>
+  <name>Informative References</name>
+
+<reference anchor="BERN"
+target="https://www.ietf.org/archive/id/draft-bernstein-netstrings-02.txt">
+  <front>
+    <title>Netstrings</title>
+    <author surname="Bernstein" initials="D."
+            fullname="Daniel J. Bernstein"/>
+    <date year="1997" month="2" day="1"/>
+  </front>
+  <seriesInfo name="Work in" value="progress"/>
+</reference>
+
+<reference anchor="SDSI"
+  target="https://people.csail.mit.edu/rivest/pubs/RL96.ver-1.1.html">
+  <front>
+    <title>A Simple Distributed Security Architecture</title>
+    <author surname="Rivest" initials="R."
+            fullname="Ronald L. Rivest"/>
+    <author surname="Lampson" initials="B."
+            fullname="Butler Lampson"/>
+    <date year="1996" month="October" day="2"/>
+  </front>
+  <seriesInfo name="working" value="document"/>
+  <seriesInfo name="SDSI version" value="1.1"/>
+</reference>
+
+<reference anchor="SPKI"
+           target="http://www.clark.net/pub/cme/html/spki.html">
+  <front>
+    <title>SPKI--A Simple Public Key Infrastructure</title>
+    <author>
+      <organization/>
+    </author>
+  </front>
+</reference>
+
+</references>
+
+</back>
+
+</rfc>
