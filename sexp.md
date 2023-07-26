@@ -154,7 +154,7 @@ readability:
 economy:
 : S-expressions should represent data compactly.
 
-tranportability:
+transportability:
 : S-expressions should be easy to transport
   over communication media (such as email) that are known to be less
   than perfect.
