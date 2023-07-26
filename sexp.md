@@ -989,7 +989,7 @@ RFC Editor Note: Please delete this section before publication.
 
 This sub-section summarizes significant changes between the
 original 1997 -00 version of this document and the 2023 version
-submited to the IETF.
+submitted to the IETF.
 
 
 1. Convert to XML v3.
