@@ -116,9 +116,9 @@ S-expressions are data structures for representing complex data.
 They are either byte-strings ("octet-strings") or lists of simpler
 S-expressions.  Here is a sample S-expression:
 
-~~~~
+~~~
     (snicker "abc" (#03# |YWJj|))
-~~~~
+~~~
 
 It is a list of length three:
 
@@ -228,7 +228,7 @@ An octet-string is a finite sequence of eight-bit octets.  There
 may be many different but equivalent ways of representing an
 octet-string
 
-~~~~
+~~~
     abc         -- as a token
     "abc"       -- as a quoted string
     #616263#    -- as a hexadecimal string
@@ -237,7 +237,7 @@ octet-string
                      encoding (that is, an encoding of "3:abc")
     |YWJj|      -- as a base-64 encoding of the octet-string
                      "abc"
-~~~~
+~~~
 
 The above encodings are all equivalent; they all denote the same
 octet string.
@@ -249,9 +249,9 @@ A list is a finite sequence of zero or more simpler S-expressions.
 A list is represented by using parentheses to surround the sequence of
 encodings of its elements, as in:
 
-~~~~
+~~~
     (abc (de #6667#) "ghi jkl")
-~~~~
+~~~
 
 As we see, there is variability possible in the encoding of an
 S-expression.  In some cases, it is desirable to standardize or
@@ -285,29 +285,29 @@ characters in US-ASCII:
 
 Alphabetic:
 
-~~~~
+~~~
     A B ... Z a b ... z
-~~~~
+~~~
 
 
 numeric:
 
-~~~~
+~~~
     0 1 ... 9
-~~~~
+~~~
 
 
 whitespace:
 
-~~~~
+~~~
     space, horizontal tab, vertical tab, form-feed
     carriage-return, line-feed
-~~~~
+~~~
 
 
 The following graphics characters, which we call "pseudo-alphabetic":
 
-~~~~
+~~~
     - hyphen or minus
     . period
     / slash
@@ -316,12 +316,12 @@ The following graphics characters, which we call "pseudo-alphabetic":
     * asterisk
     + plus
     = equal
-~~~~
+~~~
 
 
 The following graphics characters, which are "reserved punctuation":
 
-~~~~
+~~~
     ( left parenthesis
     ) right parenthesis
     [ left bracket
@@ -333,13 +333,13 @@ The following graphics characters, which are "reserved punctuation":
     " double quote
     & ampersand
     \ backslash
-~~~~
+~~~
 
 
 The following characters are unused and unavailable, except in
 "verbatim" and "quoted string" encodings:
 
-~~~~
+~~~
     ! exclamation point
     % percent
     ^ circumflex
@@ -350,7 +350,7 @@ The following characters are unused and unavailable, except in
     < less than
     > greater than
     ? question mark
-~~~~
+~~~
 
 
 
@@ -380,14 +380,14 @@ called a "binary" or "raw" encoding.
 
 Here are some sample verbatim encodings:
 
-~~~~
+~~~
     3:abc
     7:subject
     4:::::
     12:hello world!
     10:abcdefghij
     0:
-~~~~
+~~~
 
 
 ## Quoted-string representation
@@ -415,7 +415,7 @@ The escape conventions within the quoted string are as follows
 extension for ignoring line terminators of just LF or CRLF and more
 restrictive octal and hexadecimal value formats):
 
-~~~~
+~~~
     \a     -- audible alert (bell)
     \b     -- backspace
     \t     -- horizontal tab
@@ -439,11 +439,11 @@ restrictive octal and hexadecimal value formats):
               CRLF to be ignored.
     \<line-feed><carriage-return>   -- causes
               LFCR to be ignored.
-~~~~
+~~~
 
 Here are some examples of quoted-string encodings:
 
-~~~~
+~~~
     "subject"
     "hi there"
     7"subject"
@@ -452,7 +452,7 @@ Here are some examples of quoted-string encodings:
     "This has \
      one."
     ""
-~~~~
+~~~
 
 
 ## Token representation
@@ -467,9 +467,9 @@ directly as a "token".
   case); numeric; or one of the eight "pseudo-alphabetic" punctuation
   marks:
 
-~~~~
+~~~
         -   .   /   _   :  *  +  =
-~~~~
+~~~
 
 (Note: upper and lower case are not equivalent.)
 
@@ -477,13 +477,13 @@ directly as a "token".
 
 Here are some examples of token representations:
 
-~~~~
+~~~
     subject
     not-before
     class-of-1997
     //microsoft.com/names/smith
     *
-~~~~
+~~~
 
 
 ## Hexadecimal representation
@@ -508,12 +508,12 @@ characters other than whitespace and hexadecimal digits.
 
 Here are some examples of hexadecimal encodings:
 
-~~~~
+~~~
     #616263#    -- represents "abc"
     3#616263#   -- also represents "abc"
     # 616
       263 #     -- also represents "abc"
-~~~~
+~~~
 
 
 ## Base-64 representation
@@ -532,9 +532,9 @@ An octet-string may be represented in a base-64 coding {{RFC4648}} consisting of
 
 The base-64 encoding uses only the characters
 
-~~~~
+~~~
     A-Z  a-z  0-9  +  /  =
-~~~~
+~~~
 
 It produces four characters of output for each three octets of input.
 If the input has one or two left-over octets of input, it produces an
@@ -549,14 +549,14 @@ than whitespace and base-64 characters.
 
 Here are some examples of base-64 encodings:
 
-~~~~
+~~~
     |YWJj|       -- represents "abc"
     | Y W
       J j |      -- also represents "abc"
     3|YWJj|      -- also represents "abc"
     |YWJjZA==|   -- represents "abcd"
     |YWJjZA|     -- also represents "abcd"
-~~~~
+~~~
 
 
 ## Display hint {#DisplayHint}
@@ -574,7 +574,7 @@ octet string.
 
 Here are some examples of display-hints:
 
-~~~~
+~~~
     [image/gif]
     [URI]
     [charset=unicode-1-1]
@@ -582,15 +582,15 @@ Here are some examples of display-hints:
     [application/postscript]
     [audio/basic]
     ["http://abc.com/display-types/funky.html"]
-~~~~
+~~~
 
 In applications an octet-string that is untyped may be considered
 to have a pre-specified "default" MIME {{RFC2046}} type.
 The MIME type
 
-~~~~
+~~~
     "text/plain; charset=utf-8"
-~~~~
+~~~
 
 is the standard default.
 
@@ -620,7 +620,7 @@ parenthesis, or precede the final right parenthesis.
 
 Here are some examples of encodings of lists:
 
-~~~~
+~~~
     (a b c)
 
     ( a ( b c ) ( ( d e ) ( e f ) )  )
@@ -628,7 +628,7 @@ Here are some examples of encodings of lists:
     (11:certificate(6:issuer3:bob)(7:subject5:alice))
 
     ({ODpFeGFtcGxlIQ==} "1997" murphy 3:XC+)
-~~~~
+~~~
 
 
 # Representation types
@@ -661,13 +661,13 @@ parentheses.
 Here are some examples of canonical representations of
 S-expressions:
 
-~~~~
+~~~
     (6:issuer3:bob)
 
     (4:icon[12:image/bitmap]9:xxxxxxxxx)
 
     (7:subject(3:ref5:alice6:mother))
-~~~~
+~~~
 
 
 ## Basic transport representation
@@ -687,11 +687,11 @@ another.
 Here are some examples of an S-expression represented in basic
 transport mode:
 
-~~~~
+~~~
     (1:a1:b1:c)
 
     {KDE6YTE6YjE6YykK}
-~~~~
+~~~
 
 The second example above is the same S-expression as the first
 encoded in base-64.
@@ -725,7 +725,7 @@ below in all caps are defined in Appendix A of {{RFC5234}}.
 
 For canonical transport:
 
-~~~~
+~~~
 sexp     =  raw / ("(" *sexp ")")
 
 raw      =  decimal ":" *OCTET
@@ -733,11 +733,11 @@ raw      =  decimal ":" *OCTET
                ;  number of OCTET indicated by the length
 
 decimal  =  %x30 / (%x31-39 *DIGIT)
-~~~~
+~~~
 
 For basic transport:
 
-~~~~
+~~~
 sexp           =  canonical / base-64-raw
 
 canonical      =  raw / ("(" *canonical ")")
@@ -751,11 +751,11 @@ decimal        =  %x30 / (%x31-39 *DIGIT)
 base-64-raw    =  "{" 3*base-64-char "}"
 
 base-64-char   =  ALPHA / DIGIT / "+" / "/" / "="
-~~~~
+~~~
 
 For advanced transport:
 
-~~~~
+~~~
 sexp           =  *whitespace value *whitespace
 
 whitespace     =  SP / HTAB / vtab / CR / LF / ff
@@ -806,7 +806,7 @@ backslash      =  %x5C
 printable      =  %x21-26 / %x28-7E
 
 quote          =  %x27   ; single quote
-~~~~
+~~~
 
 
 # In-memory representations
@@ -837,13 +837,13 @@ details are omitted here.
 Here each S-expression is represented as a contiguous array of bytes.
 The first byte codes the "type" of the S-expression:
 
-~~~~
+~~~
     01   octet-string
 
     02   octet-string with display-hint
 
     03   beginning of list (and 00 is used for "end of list")
-~~~~
+~~~
 
 Each of the three types is immediately followed by a k-byte integer
 indicating the size (in bytes) of the following representation.  Here
@@ -863,54 +863,54 @@ length.
 
 This is represented as follows:
 
-~~~~
+~~~
     01 <length> <octet-string>
-~~~~
+~~~
 
 For example (here k = 2)
 
-~~~~
+~~~
     01 0003 a b c
-~~~~
+~~~
 
 
 ### Octet-string with display-hint
 
 This is represented as follows:
 
-~~~~
+~~~
     02 <length>
       01 <length> <octet-string>    /* for display-type */
       01 <length> <octet-string>    /* for octet-string */
-~~~~
+~~~
 
 For example, the S-expression
 
-~~~~
+~~~
     [gif] #61626364#
-~~~~
+~~~
 
 would be represented as (with k = 2)
 
-~~~~
+~~~
     02 000d
       01 0003  g  i  f
       01 0004 61 62 63 64
-~~~~
+~~~
 
 
 ### List
 
 This is represented as
 
-~~~~
+~~~
     03 <length> <item1> <item2> <item3> ... <itemn> 00
-~~~~
+~~~
 
 For example, the list (abc \[d]ef (g)) is represented in memory as
 (with k=2)
 
-~~~~
+~~~
     03 001b
       01 0003 a b c
       02 0009
@@ -920,7 +920,7 @@ For example, the list (abc \[d]ef (g)) is represented in memory as
         01 0001 g
       00
     00
-~~~~
+~~~
 
 
 
