@@ -123,7 +123,9 @@ It is a list of length three:
 
 - the octet-string "abc"
 
-- a sub-list containing two elements: the hexadecimal constant #03# and the base-64 constant \|YWJj\| (which is the same as "abc")
+- a sub-list containing two elements:
+  - the hexadecimal constant #03#
+  - the base-64 constant \|YWJj\| (which is the same as "abc")
 
 This note gives a specific proposal for constructing and utilizing S-expressions.
 The proposal is independent of any particular application.
