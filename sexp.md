@@ -225,11 +225,11 @@ As we see, there is variability possible in the encoding of an S-expression.
 In some cases, it is desirable to standardize or restrict the encodings; in other cases it is desirable to have no restrictions.
 The following are the target cases we aim to handle:
 
-- a "transport" or "basic" encoding for transporting the S-expression between computers.
+- a "transport" (or "basic transport") encoding for transporting the S-expression between computers.
 
 - a "canonical" encoding, used when signing the S-expression.
 
-- an "advanced" encoding used for input/output to people.
+- an "advanced" (or "advanced transport") encoding used for input/output to people.
 
 - an "in-memory" encoding used for processing the S-expression in the computer.
 
@@ -698,26 +698,21 @@ quote          =  %x27   ; single quote
 
 # In-memory representations
 
-For processing, the S-expression would typically be parsed and
-represented in memory in a way that is more amenable to efficient
-processing.  We suggest two alternatives:
-
+For processing, the S-expression would typically be parsed and represented in memory in a way that is more amenable to efficient processing.
+We suggest two alternatives:
 
 - "list-structure"
 
 - "array-layout"
 
-We only sketch these here, as they are only suggestive.  The code
-referenced below illustrates these styles in more detail.
+We only sketch these here, as they are only suggestive.
+The code referenced below illustrates these styles in more detail.
 
 ## List-structure memory representation
 
-Here there are separate records for simple-strings, strings, and
-lists.  An S-expression of the form ("abc" "de") would require two
-records for the simple strings, two for the strings, and two for the
-list elements.  This is a fairly conventional representation, and
-details are omitted here.
-
+Here there are separate records for simple-strings, strings, and lists.
+An S-expression of the form ("abc" "de") would require two records for the simple strings, two for the strings, and two for the list elements.
+This is a fairly conventional representation, and details are omitted here.
 
 ## Array-layout memory representation
 
@@ -732,19 +727,11 @@ The first byte codes the "type" of the S-expression:
 03   beginning of list (and 00 is used for "end of list")
 ~~~
 
-Each of the three types is immediately followed by a k-byte integer
-indicating the size (in bytes) of the following representation.  Here
-k is an integer that depends on the implementation, it might be
-anywhere from 2 to 8, but would be fixed for a given implementation;
-it determines the size of the objects that can be handled.  The
-transport and canonical representations are independent of the choice
-of k made by the implementation.
+Each of the three types is immediately followed by a k-byte integer indicating the size (in bytes) of the following representation.
+Here k is an integer that depends on the implementation, it might be anywhere from 2 to 8, but would be fixed for a given implementation; it determines the size of the objects that can be handled.
+The transport and canonical representations are independent of the choice of k made by the implementation.
 
-Although the length of lists are not given in the usual
-S-expression notations, it is easy to fill them in when parsing; when
-you reach a right-parenthesis you know how long the list
-representation was, and where to go back to fill in the missing
-length.
+Although the length of lists are not given in the usual S-expression notations, it is easy to fill them in when parsing; when you reach a right-parenthesis you know how long the list representation was, and where to go back to fill in the missing length.
 
 ### Octet string
 
@@ -759,7 +746,6 @@ For example (here k = 2)
 ~~~
 01 0003 a b c
 ~~~
-
 
 ### Octet-string with display-hint
 
@@ -785,7 +771,6 @@ would be represented as (with k = 2)
   01 0004 61 62 63 64
 ~~~
 
-
 ### List
 
 This is represented as
@@ -794,8 +779,7 @@ This is represented as
 03 <length> <item1> <item2> <item3> ... <itemn> 00
 ~~~
 
-For example, the list (abc \[d]ef (g)) is represented in memory as
-(with k=2)
+For example, the list (abc \[d]ef (g)) is represented in memory as (with k=2)
 
 ~~~
 03 001b
@@ -809,14 +793,10 @@ For example, the list (abc \[d]ef (g)) is represented in memory as
 00
 ~~~
 
-
-
-
 # Code {#Code}
 
-At this time there is code available that is intended to read and parse
-some or all of the various S-expression formats specified here. In
-particular, see the following likely incomplete list:
+At this time there is code available that is intended to read and parse some or all of the various S-expression formats specified here.
+In particular, see the following likely incomplete list:
 
 - Project GNU's {{Libgcrypt}}.
 
