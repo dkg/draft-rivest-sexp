@@ -102,19 +102,16 @@ informative:
     date: false
 --- abstract
 
-This memo describes a data structure called "S-expressions" that
-are suitable for representing arbitrary, complex data structures.  We
-make precise the encodings of S-expressions: we give a "canonical
-form" for S-expressions, described two "transport" representations,
-and also describe an "advanced" format for display to people.
+This memo describes a data structure called "S-expressions" that are suitable for representing arbitrary, complex data structures.
+We make precise the encodings of S-expressions: we give a "canonical form" for S-expressions, described two "transport" representations, and also describe an "advanced" format for display to people.
 
 --- middle
 
 # Introduction
 
 S-expressions are data structures for representing complex data.
-They are either byte-strings ("octet-strings") or lists of simpler
-S-expressions.  Here is a sample S-expression:
+They are either byte-strings ("octet-strings") or lists of simpler S-expressions.
+Here is a sample S-expression:
 
 ~~~
     (snicker "abc" (#03# |YWJj|))
