@@ -29,12 +29,10 @@ author:
   country: US
   phone: "+1-508-333-2270"
   email: d3e3e3@gmail.com
-
 contributor:
 - name: Marc Petit-Huguenin
   org: Impedance Mismatch LLC
   email: marc@petit-huguenin.org
-
 normative:
   RFC4648:
   RFC5234:
@@ -102,9 +100,7 @@ informative:
     author:
     - org: ''
     date: false
-
 --- abstract
-
 
 This memo describes a data structure called "S-expressions" that
 are suitable for representing arbitrary, complex data structures.  We
@@ -991,59 +987,59 @@ original 1997 -00 version of this document and the 2023 version
 submitted to the IETF.
 
 
-1. Convert to XML v3.
+- Convert to XML v3.
 
-1. Update Ron Rivest author information and, with his permission,
+- Update Ron Rivest author information and, with his permission,
   add Donald Eastlake as an author.
 
-1. Add minimal "IANA Considerations" and "Security
+- Add minimal "IANA Considerations" and "Security
   Considerations" sections.
 
-1. Since implementation requirements terminology is used, add the
+- Since implementation requirements terminology is used, add the
   usual paragraph about it as a sub-section of Section 1 and add
   references to {{RFC2119}} and {{RFC8174}}.
 
-1. Divide references into Normative and Informational and update
+- Divide references into Normative and Informational and update
   base-64 reference to be to {{RFC4648}}.
 
-1. Add a couple of sentence to the "Historical note" section about
+- Add a couple of sentence to the "Historical note" section about
   the history of -00 versions of the draft.
 
 
 ## Changes from -00 to -01
 
 
-1. Fix glitches and errors in the BNF.
+- Fix glitches and errors in the BNF.
 
-1. Add Acknowledgements section to list Marc Petit-Huguenin (who
+- Add Acknowledgements section to list Marc Petit-Huguenin (who
   provided BNF improvements) and John Klensin.
 
-1. Update code references in {{Code}} and add to
+- Update code references in {{Code}} and add to
   Informative References section. Note: The code
   in the Malkiewicz github repository may be the code that was
   originally at http://theory.lcs.mit.edu/~rivest/sexp.html
 
-1. Add this Change History Appendix.
+- Add this Change History Appendix.
 
-1. Move "Historical Notes" which were formerly a separate section
+- Move "Historical Notes" which were formerly a separate section
   at the end of the document up to be a sub-section of Section 1.
 
-1. Add references to {{LISP}}, {{RFC2692}}, and {{RFC2693}}.
+- Add references to {{LISP}}, {{RFC2692}}, and {{RFC2693}}.
 
-1. Add simple security considerations.
+- Add simple security considerations.
 
-1. Minor editorial fixes/improvements.
+- Minor editorial fixes/improvements.
 
 
 ## Changes from -01 to -02
 
 
-1. Change default MIME Type in {{DisplayHint}} to have
+- Change default MIME Type in {{DisplayHint}} to have
   charset=utf-8 {{RFC4648}}.
 
-1. Change BNF to ABNF and add reference to {{RFC5234}}.
+- Change BNF to ABNF and add reference to {{RFC5234}}.
 
-1. Move Marc Petit-Huguenin to a Contributors section for his work
+- Move Marc Petit-Huguenin to a Contributors section for his work
   on the ABNF.
 
 
