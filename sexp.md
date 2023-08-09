@@ -816,11 +816,9 @@ At this time there is code available that is intended to read and parse
 some or all of the various S-expression formats specified here. In
 particular, see the following likely incomplete list:
 
-
 - Project GNU's {{Libgcrypt}}.
 
 - Github project of J. P. Malkiewicz {{SexpCode}}.
-
 
 # Utilization of S-expressions
 
@@ -829,7 +827,6 @@ S-expressions are used in {{SPKI}} specified in {{RFC2693}}.
 This note has described S-expressions in general form.
 Application writers may wish to restrict their use of S-expressions in various ways.
 Here are some possible restrictions that might be considered:
-
 
 - no display-hints
 
@@ -864,7 +861,6 @@ RFC Editor Note: Please delete this section before publication.
 
 This sub-section summarizes significant changes between the original 1997 -00 version of this document and the 2023 version submitted to the IETF.
 
-
 - Convert to XML v3.
 
 - Update Ron Rivest author information and, with his permission, add Donald Eastlake as an author.
@@ -877,9 +873,7 @@ This sub-section summarizes significant changes between the original 1997 -00 ve
 
 - Add a couple of sentence to the "Historical note" section about the history of -00 versions of the draft.
 
-
 ## Changes from -00 to -01
-
 
 - Fix glitches and errors in the BNF.
 
@@ -897,17 +891,13 @@ This sub-section summarizes significant changes between the original 1997 -00 ve
 
 - Minor editorial fixes/improvements.
 
-
 ## Changes from -01 to -02
-
 
 - Change default MIME Type in {{DisplayHint}} to have charset=utf-8 {{RFC4648}}.
 
 - Change BNF to ABNF and add reference to {{RFC5234}}.
 
 - Move Marc Petit-Huguenin to a Contributors section for his work on the ABNF.
-
-
 
 # Acknowledgements {#Acknowledgements}
 {: numbered="false"}
