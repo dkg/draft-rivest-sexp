@@ -114,7 +114,7 @@ They are either byte-strings ("octet-strings") or lists of simpler S-expressions
 Here is a sample S-expression:
 
 ~~~
-    (snicker "abc" (#03# |YWJj|))
+(snicker "abc" (#03# |YWJj|))
 ~~~
 
 It is a list of length three:
@@ -198,14 +198,14 @@ An octet-string is a finite sequence of eight-bit octets.
 There may be many different but equivalent ways of representing an octet-string
 
 ~~~
-    abc         -- as a token
-    "abc"       -- as a quoted string
-    #616263#    -- as a hexadecimal string
-    3:abc       -- as a length-prefixed "verbatim" encoding
-    {MzphYmM=}  -- as a base-64 encoding of the verbatim
-                     encoding (that is, an encoding of "3:abc")
-    |YWJj|      -- as a base-64 encoding of the octet-string
-                     "abc"
+abc         -- as a token
+"abc"       -- as a quoted string
+#616263#    -- as a hexadecimal string
+3:abc       -- as a length-prefixed "verbatim" encoding
+{MzphYmM=}  -- as a base-64 encoding of the verbatim
+                 encoding (that is, an encoding of "3:abc")
+|YWJj|      -- as a base-64 encoding of the octet-string
+                 "abc"
 ~~~
 
 The above encodings are all equivalent; they all denote the same octet string.
@@ -216,7 +216,7 @@ A list is a finite sequence of zero or more simpler S-expressions.
 A list is represented by using parentheses to surround the sequence of encodings of its elements, as in:
 
 ~~~
-    (abc (de #6667#) "ghi jkl")
+(abc (de #6667#) "ghi jkl")
 ~~~
 
 As we see, there is variability possible in the encoding of an S-expression.
@@ -242,64 +242,64 @@ Except when giving "verbatim" encodings, the character set used is limited to th
 Alphabetic:
 
 ~~~
-    A B ... Z a b ... z
+A B ... Z a b ... z
 ~~~
 
 numeric:
 
 ~~~
-    0 1 ... 9
+0 1 ... 9
 ~~~
 
 whitespace:
 
 ~~~
-    space, horizontal tab, vertical tab, form-feed
-    carriage-return, line-feed
+space, horizontal tab, vertical tab, form-feed
+carriage-return, line-feed
 ~~~
 
 The following graphics characters, which we call "pseudo-alphabetic":
 
 ~~~
-    - hyphen or minus
-    . period
-    / slash
-    _ underscore
-    : colon
-    * asterisk
-    + plus
-    = equal
+- hyphen or minus
+. period
+/ slash
+_ underscore
+: colon
+* asterisk
++ plus
+= equal
 ~~~
 
 The following graphics characters, which are "reserved punctuation":
 
 ~~~
-    ( left parenthesis
-    ) right parenthesis
-    [ left bracket
-    ] right bracket
-    { left brace
-    } right brace
-    | vertical bar
-    # number sign
-    " double quote
-    & ampersand
-    \ backslash
+( left parenthesis
+) right parenthesis
+[ left bracket
+] right bracket
+{ left brace
+} right brace
+| vertical bar
+# number sign
+" double quote
+& ampersand
+\ backslash
 ~~~
 
 The following characters are unused and unavailable, except in "verbatim" and "quoted string" encodings:
 
 ~~~
-    ! exclamation point
-    % percent
-    ^ circumflex
-    ~ tilde
-    ; semicolon
-    ' apostrophe
-    , comma
-    < less than
-    > greater than
-    ? question mark
+! exclamation point
+% percent
+^ circumflex
+~ tilde
+; semicolon
+' apostrophe
+, comma
+< less than
+> greater than
+? question mark
 ~~~
 
 # Octet string representations
@@ -325,12 +325,12 @@ This encoding is also called a "binary" or "raw" encoding.
 Here are some sample verbatim encodings:
 
 ~~~
-    3:abc
-    7:subject
-    4:::::
-    12:hello world!
-    10:abcdefghij
-    0:
+3:abc
+7:subject
+4:::::
+12:hello world!
+10:abcdefghij
+0:
 ~~~
 
 ## Quoted-string representation
@@ -353,42 +353,42 @@ The length is optional.
 The escape conventions within the quoted string are as follows (these follow the "C" programming language conventions, with an extension for ignoring line terminators of just LF or CRLF and more restrictive octal and hexadecimal value formats):
 
 ~~~
-    \a     -- audible alert (bell)
-    \b     -- backspace
-    \t     -- horizontal tab
-    \v     -- vertical tab
-    \n     -- new-line
-    \f     -- form-feed
-    \r     -- carriage-return
-    \"     -- double-quote
-    \'     -- single-quote
-    \?     -- question mark
-    \\     -- back-slash
-    \ooo   -- character with octal value ooo (all three
-              digits MUST be present)
-    \xhh   -- character with hexadecimal value hh (both
-              digits MUST be present)
-    \<carriage-return>   -- causes carriage-return
-              to be ignored.
-    \<line-feed>         -- causes linefeed to be
-              ignored.
-    \<carriage-return><line-feed>   -- causes
-              CRLF to be ignored.
-    \<line-feed><carriage-return>   -- causes
-              LFCR to be ignored.
+\a     -- audible alert (bell)
+\b     -- backspace
+\t     -- horizontal tab
+\v     -- vertical tab
+\n     -- new-line
+\f     -- form-feed
+\r     -- carriage-return
+\"     -- double-quote
+\'     -- single-quote
+\?     -- question mark
+\\     -- back-slash
+\ooo   -- character with octal value ooo (all three
+          digits MUST be present)
+\xhh   -- character with hexadecimal value hh (both
+          digits MUST be present)
+\<carriage-return>   -- causes carriage-return
+          to be ignored.
+\<line-feed>         -- causes linefeed to be
+          ignored.
+\<carriage-return><line-feed>   -- causes
+          CRLF to be ignored.
+\<line-feed><carriage-return>   -- causes
+          LFCR to be ignored.
 ~~~
 
 Here are some examples of quoted-string encodings:
 
 ~~~
-    "subject"
-    "hi there"
-    7"subject"
-    3"\n\n\n"
-    "This has\n two lines."
-    "This has \
-     one."
-    ""
+"subject"
+"hi there"
+7"subject"
+3"\n\n\n"
+"This has\n two lines."
+"This has \
+ one."
+""
 ~~~
 
 ## Token representation
@@ -400,7 +400,7 @@ An octet string that meets the following conditions may be given directly as a "
 - it contains only characters that are: alphabetic (upper or lower case); numeric; or one of the eight "pseudo-alphabetic" punctuation marks:
 
 ~~~
-        -   .   /   _   :  *  +  =
+    -   .   /   _   :  *  +  =
 ~~~
 
 (Note: upper and lower case are not equivalent.)
@@ -410,11 +410,11 @@ An octet string that meets the following conditions may be given directly as a "
 Here are some examples of token representations:
 
 ~~~
-    subject
-    not-before
-    class-of-1997
-    //microsoft.com/names/smith
-    *
+subject
+not-before
+class-of-1997
+//microsoft.com/names/smith
+*
 ~~~
 
 ## Hexadecimal representation
@@ -437,10 +437,10 @@ It is an error to have characters other than whitespace and hexadecimal digits.
 Here are some examples of hexadecimal encodings:
 
 ~~~
-    #616263#    -- represents "abc"
-    3#616263#   -- also represents "abc"
-    # 616
-      263 #     -- also represents "abc"
+#616263#    -- represents "abc"
+3#616263#   -- also represents "abc"
+# 616
+  263 #     -- also represents "abc"
 ~~~
 
 
@@ -459,7 +459,7 @@ An octet-string may be represented in a base-64 coding {{RFC4648}} consisting of
 The base-64 encoding uses only the characters
 
 ~~~
-    A-Z  a-z  0-9  +  /  =
+A-Z  a-z  0-9  +  /  =
 ~~~
 
 It produces four characters of output for each three octets of input.
@@ -473,12 +473,12 @@ It is an error to have characters other than whitespace and base-64 characters.
 Here are some examples of base-64 encodings:
 
 ~~~
-    |YWJj|       -- represents "abc"
-    | Y W
-      J j |      -- also represents "abc"
-    3|YWJj|      -- also represents "abc"
-    |YWJjZA==|   -- represents "abcd"
-    |YWJjZA|     -- also represents "abcd"
+|YWJj|       -- represents "abc"
+| Y W
+  J j |      -- also represents "abc"
+3|YWJj|      -- also represents "abc"
+|YWJjZA==|   -- represents "abcd"
+|YWJjZA|     -- also represents "abcd"
 ~~~
 
 ## Display hint {#DisplayHint}
@@ -496,20 +496,20 @@ Any of the legal formats may be used for the octet string.
 Here are some examples of display-hints:
 
 ~~~
-    [image/gif]
-    [URI]
-    [charset=unicode-1-1]
-    [text/richtext]
-    [application/postscript]
-    [audio/basic]
-    ["http://abc.com/display-types/funky.html"]
+[image/gif]
+[URI]
+[charset=unicode-1-1]
+[text/richtext]
+[application/postscript]
+[audio/basic]
+["http://abc.com/display-types/funky.html"]
 ~~~
 
 In applications an octet-string that is untyped may be considered to have a pre-specified "default" MIME {{RFC2046}} type.
 The MIME type
 
 ~~~
-    "text/plain; charset=utf-8"
+"text/plain; charset=utf-8"
 ~~~
 
 is the standard default.
@@ -531,13 +531,13 @@ Also, whitespace may follow the initial left parenthesis, or precede the final r
 Here are some examples of encodings of lists:
 
 ~~~
-    (a b c)
+(a b c)
 
-    ( a ( b c ) ( ( d e ) ( e f ) )  )
+( a ( b c ) ( ( d e ) ( e f ) )  )
 
-    (11:certificate(6:issuer3:bob)(7:subject5:alice))
+(11:certificate(6:issuer3:bob)(7:subject5:alice))
 
-    ({ODpFeGFtcGxlIQ==} "1997" murphy 3:XC+)
+({ODpFeGFtcGxlIQ==} "1997" murphy 3:XC+)
 ~~~
 
 # Representation types
@@ -565,11 +565,11 @@ The "canonical" form of an S-expression represents each octet-string in verbatim
 Here are some examples of canonical representations of S-expressions:
 
 ~~~
-    (6:issuer3:bob)
+(6:issuer3:bob)
 
-    (4:icon[12:image/bitmap]9:xxxxxxxxx)
+(4:icon[12:image/bitmap]9:xxxxxxxxx)
 
-    (7:subject(3:ref5:alice6:mother))
+(7:subject(3:ref5:alice6:mother))
 ~~~
 
 ## Basic transport representation
@@ -585,9 +585,9 @@ The transport mechanism is intended to provide a universal means of representing
 Here are some examples of an S-expression represented in basic transport mode:
 
 ~~~
-    (1:a1:b1:c)
+(1:a1:b1:c)
 
-    {KDE6YTE6YjE6YykK}
+{KDE6YTE6YjE6YykK}
 ~~~
 
 The second example above is the same S-expression as the first encoded in base-64.
@@ -723,11 +723,11 @@ Here each S-expression is represented as a contiguous array of bytes.
 The first byte codes the "type" of the S-expression:
 
 ~~~
-    01   octet-string
+01   octet-string
 
-    02   octet-string with display-hint
+02   octet-string with display-hint
 
-    03   beginning of list (and 00 is used for "end of list")
+03   beginning of list (and 00 is used for "end of list")
 ~~~
 
 Each of the three types is immediately followed by a k-byte integer
@@ -749,13 +749,13 @@ length.
 This is represented as follows:
 
 ~~~
-    01 <length> <octet-string>
+01 <length> <octet-string>
 ~~~
 
 For example (here k = 2)
 
 ~~~
-    01 0003 a b c
+01 0003 a b c
 ~~~
 
 
@@ -764,23 +764,23 @@ For example (here k = 2)
 This is represented as follows:
 
 ~~~
-    02 <length>
-      01 <length> <octet-string>    /* for display-type */
-      01 <length> <octet-string>    /* for octet-string */
+02 <length>
+  01 <length> <octet-string>    /* for display-type */
+  01 <length> <octet-string>    /* for octet-string */
 ~~~
 
 For example, the S-expression
 
 ~~~
-    [gif] #61626364#
+[gif] #61626364#
 ~~~
 
 would be represented as (with k = 2)
 
 ~~~
-    02 000d
-      01 0003  g  i  f
-      01 0004 61 62 63 64
+02 000d
+  01 0003  g  i  f
+  01 0004 61 62 63 64
 ~~~
 
 
@@ -789,22 +789,22 @@ would be represented as (with k = 2)
 This is represented as
 
 ~~~
-    03 <length> <item1> <item2> <item3> ... <itemn> 00
+03 <length> <item1> <item2> <item3> ... <itemn> 00
 ~~~
 
 For example, the list (abc \[d]ef (g)) is represented in memory as
 (with k=2)
 
 ~~~
-    03 001b
-      01 0003 a b c
-      02 0009
-        01 0001 d
-        01 0002 e f
-      03 0005
-        01 0001 g
-      00
-    00
+03 001b
+  01 0003 a b c
+  02 0009
+    01 0001 d
+    01 0002 e f
+  03 0005
+    01 0001 g
+  00
+00
 ~~~
 
 
